@@ -165,6 +165,9 @@ class WebMaxipublicaService {
                     Action                  : EventoArealizar
 
             ]
+
+
+
             def result = authenticateService.login(Usuario, Contraseña)
 
             if (result.data.access_token) {
@@ -184,17 +187,19 @@ class WebMaxipublicaService {
                 println "El json de respuesta de la api de vehicle es"+respApiVehicle
 
                 if (respApiVehicle.data.id){
-                    response = respApiVehicle.data.id
+                    publicaService.postImages(DataWsMap, accessToken, respApiVehicle.data.id)
+                    response = "0 - "+respApiVehicle.data.id
                 }else{
-                    response = "8"
+                    response = "8 - "+respApiVehicle.data.message
                 }
 
 
 
 
             } else {
-                response = "1" //"EL usuario y/o contraseña no son validos"
+                response = "1 - El usuario y o contraseña no son validos" //"EL usuario y/o contraseña no son validos"
             }
+
         }
 
         return  response

@@ -7,10 +7,6 @@ class HomologaService {
 
     def homologaData(def dataMap, def userId, def dealerId) {
 
-        // vamos a ver como podemos procesar el equipamiento
-        // vamos a ver como podemos procesar los attributos
-        // vamos a ver como podemo procesar las imagenes
-
         def jsonVehicle = createJsonVehicle(dataMap, userId, dealerId)
 
         jsonVehicle
@@ -54,12 +50,65 @@ class HomologaService {
                 images:[
 
                 ],
-                attributes:getAttributes(),
+                attributes:getAttributes(dataMap.TypeCurrency, dataMap.ExteriorColor, dataMap.InteriorColor, dataMap.TypeVestureMPId, dataMap.TypeTransmissionMPId, dataMap.TypeVehicleMPId),
                 equipment:getEquipment()
 
         ]
 
         jsonVehicleForPost
+    }
+
+    def createJsonImages (def urlImage){
+
+        def images = []
+        images << [url:urlImage]
+        def jsonImages = [
+                images:images
+        ]
+        jsonImages
+    }
+
+
+
+    def getAttributes(def TypeCurrency,
+                      def ExteriorColor,
+                      def InteriorColor,
+                      def TypeVestureMPId,
+                      def TypeTransmissionMPId,
+                      def TypeVehicleMPId ){
+
+        def jsonAttributes = []
+
+        try{
+            jsonAttributes = [
+
+                    id:"attributes_group",
+                    label:"Ficha Tecnica",
+                    currencies:[
+                            id:TypeCurrency.toUpperCase()
+                    ],
+                    colorExt:[
+                            id:ExteriorColor.toUpperCase()
+                    ],
+                    colorInt:[
+                            id:InteriorColor.toUpperCase()
+                    ],
+                    vesture:[
+                            id:TypeVestureMPId.toUpperCase()
+                    ],
+                    transmission:[
+                            id:TypeTransmissionMPId.toUpperCase()
+                    ],
+                    body_type:[
+                            id:TypeVehicleMPId.toUpperCase()
+                    ]
+
+            ]
+        }catch(Exception e){
+            jsonAttributes = []
+        }
+
+        jsonAttributes
     }
 
     def getEquipment(){
@@ -91,53 +140,6 @@ class HomologaService {
         ]
 
         jsonEquipment
-    }
-
-    def getAttributes(){
-
-        def jsonAttributes = [
-
-                id:"attributes_group",
-                label:"Ficha Tecnica",
-                currencies:[
-                        id:"CURRENCIE-MXN",
-                        label:"Moneda",
-                        value:"MXN"
-                ],
-                colorInt:[
-                        id:"COLORINT-BEIGE",
-                        label:"Color Interior",
-                        value:"Beige"
-                ],
-                direction:[
-                        id:"DIRECCION-ASISTIDA",
-                        label:"Dirección",
-                        value:"Asistida"
-                ],
-                vesture:[
-                        id:"VESTURE-TELA",
-                        label:"Vestidura",
-                        value:"Tela"
-                ],
-                transmission:[
-                        id:"TRANS-TRONIC",
-                        label:"TRansmisión",
-                        value:"Tronic"
-                ],
-                colorExt:[
-                        id:"COLOREXT-AZUL",
-                        label:"Color Exterior",
-                        value:"Azul"
-                ],
-                body_type:[
-                        id:"BODY-SEDAN",
-                        label:"Tipo de carroceria",
-                        value:"Sedan"
-                ]
-
-        ]
-
-        jsonAttributes
     }
 
     /*

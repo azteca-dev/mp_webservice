@@ -8,6 +8,7 @@ class WebMaxipublicaService {
     def authenticateService = new AuthenticateService()
     def homologaService
     def publicaService
+    def logwsService
 
     static expose=['cxf']
 
@@ -84,89 +85,82 @@ class WebMaxipublicaService {
         def jsonVehicle
         def userId
         def dealerId
+        def logMap
 
-        //primer paso, verificamos los datos authenticamos
-        //obtenmos los datos y hacemos las validaciones
-        //guardamos un log con los datos que se accedieron
-        //si todo sale bien entonce hacemos la homologacion de datos
-        //mandamos a publicar a la api de vehicles
-        // obtenemos la respuesta
 
-        //Verificar si antes del mapeo revisamos si algunos datos son obligatorios
+        def DataWsMap = [
 
-        if(!Usuario && !Contraseña){
-            response = "1"
+                User                    : Usuario,
+                Pass                    : Contraseña,
+                StockNumber             : NumInventarioEmpresa,
+                Description             : Descripcion,
+                Price                   : Precio,
+                TypeCurrency            : TipoMoneda,
+                TypePriceMPId           : Tipo_PrecioIDAutoplaza,
+                Kilometers              : Kilometraje,
+                TypeKilometersMPId      : Tipo_KilometrajeIDAutoplaza,
+                ExteriorColor           : ColorExterior,
+                InteriorColor           : ColorInterior,
+                Mark                    : Marca,
+                MarkMPId                : MarcaIDAutoplaza,
+                Model                   : Modelo,
+                ModelMPId               : ModeloIDAutoplaza,
+                Version                 : Submodelo,
+                VersionIntId            : SubmodeloIDInterno,
+                VersionMPId             : SubmodeloIDAutoplaza,
+                Year                    : Anno,
+                TypeVehicleMPId         : TipoVehiculoIDAutoplaza,
+                TypeVestureMPId         : TipoVestiduraIDAutoplaza,
+                TypeTransmissionMPId    : TipoTransmisionIDAutoplaza,
+                StatusVehicleMPId       : StatusVehiculoIDAutoplaza,
+                DealerMPId              : EmpresaIDAutoplaza,
+                DealerIntId             : EmpresaIDInterno,
+                VehicleArmour           : AutoBlindado,
+                VehicleAccidentRecovered: AutoAccidentadoRecuperado,
+                NumSerie                : NumSerieAuto,
+                Equipment               : Equipamiento,
+                Pic1                    : UrlFoto1,
+                Pic2                    : UrlFoto2,
+                Pic3                    : UrlFoto3,
+                Pic4                    : UrlFoto4,
+                Pic5                    : UrlFoto5,
+                Pic6                    : UrlFoto6,
+                Pic7                    : UrlFoto7,
+                Pic8                    : UrlFoto8,
+                Pic9                    : UrlFoto9,
+                Pic10                   : UrlFoto10,
+                Pic11                   : UrlFoto11,
+                Pic12                   : UrlFoto12,
+                Pic13                   : UrlFoto13,
+                Pic14                   : UrlFoto14,
+                Pic15                   : UrlFoto15,
+                Pic16                   : UrlFoto16,
+                Pic17                   : UrlFoto17,
+                Pic18                   : UrlFoto18,
+                Pic19                   : UrlFoto19,
+                Pic20                   : UrlFoto20,
+                Pic21                   : UrlFoto21,
+                Pic22                   : UrlFoto22,
+                Pic23                   : UrlFoto23,
+                Pic24                   : UrlFoto24,
+                Pic25                   : UrlFoto25,
+                Pic26                   : UrlFoto26,
+                Pic27                   : UrlFoto27,
+                Pic28                   : UrlFoto28,
+                Pic29                   : UrlFoto29,
+                Pic30                   : UrlFoto30,
+                Pic31                   : UrlFoto31,
+                Pic32                   : UrlFoto32,
+                Action                  : EventoArealizar
+
+        ]
+
+        def validateData = homologaService.validateDataMap(DataWsMap)
+
+
+        if(validateData.status != "0"){
+            response = validateData.status+"-"+validateData.message
         }else {
-
-
-            def DataWsMap = [
-
-                    User                    : Usuario,
-                    Pass                    : Contraseña,
-                    StockNumber             : NumInventarioEmpresa,
-                    Description             : Descripcion,
-                    Price                   : Precio,
-                    TypeCurrency            : TipoMoneda,
-                    TypePriceMPId           : Tipo_PrecioIDAutoplaza,
-                    Kilometers              : Kilometraje,
-                    TypeKilometersMPId      : Tipo_KilometrajeIDAutoplaza,
-                    ExteriorColor           : ColorExterior,
-                    InteriorColor           : ColorInterior,
-                    Mark                    : Marca,
-                    MarkMPId                : MarcaIDAutoplaza,
-                    Model                   : Modelo,
-                    ModelMPId               : ModeloIDAutoplaza,
-                    Version                 : Submodelo,
-                    VersionIntId            : SubmodeloIDInterno,
-                    VersionMPId             : SubmodeloIDAutoplaza,
-                    Year                    : Anno,
-                    TypeVehicleMPId         : TipoVehiculoIDAutoplaza,
-                    TypeVestureMPId         : TipoVestiduraIDAutoplaza,
-                    TypeTransmissionMPId    : TipoTransmisionIDAutoplaza,
-                    StatusVehicleMPId       : StatusVehiculoIDAutoplaza,
-                    DealerMPId              : EmpresaIDAutoplaza,
-                    DealerIntId             : EmpresaIDInterno,
-                    VehicleArmour           : AutoBlindado,
-                    VehicleAccidentRecovered: AutoAccidentadoRecuperado,
-                    NumSerie                : NumSerieAuto,
-                    Equipment               : Equipamiento,
-                    Pic1                    : UrlFoto1,
-                    Pic2                    : UrlFoto2,
-                    Pic3                    : UrlFoto3,
-                    Pic4                    : UrlFoto4,
-                    Pic5                    : UrlFoto5,
-                    Pic6                    : UrlFoto6,
-                    Pic7                    : UrlFoto7,
-                    Pic8                    : UrlFoto8,
-                    Pic9                    : UrlFoto9,
-                    Pic10                   : UrlFoto10,
-                    Pic11                   : UrlFoto11,
-                    Pic12                   : UrlFoto12,
-                    Pic13                   : UrlFoto13,
-                    Pic14                   : UrlFoto14,
-                    Pic15                   : UrlFoto15,
-                    Pic16                   : UrlFoto16,
-                    Pic17                   : UrlFoto17,
-                    Pic18                   : UrlFoto18,
-                    Pic19                   : UrlFoto19,
-                    Pic20                   : UrlFoto20,
-                    Pic21                   : UrlFoto21,
-                    Pic22                   : UrlFoto22,
-                    Pic23                   : UrlFoto23,
-                    Pic24                   : UrlFoto24,
-                    Pic25                   : UrlFoto25,
-                    Pic26                   : UrlFoto26,
-                    Pic27                   : UrlFoto27,
-                    Pic28                   : UrlFoto28,
-                    Pic29                   : UrlFoto29,
-                    Pic30                   : UrlFoto30,
-                    Pic31                   : UrlFoto31,
-                    Pic32                   : UrlFoto32,
-                    Action                  : EventoArealizar
-
-            ]
-
-
 
             def result = authenticateService.login(Usuario, Contraseña)
 
@@ -175,29 +169,46 @@ class WebMaxipublicaService {
                 userId      = result.data.user_id
                 def resultDealer = authenticateService.getDealer(userId, accessToken)
 
+
+                logMap = [
+                        section:"pre-publication",
+                        user:DataWsMap.User,
+                        description:"Contiene los datos iniciales antes de enviar a la api de vehicle de maxipublica",
+                        data:[numInventario:DataWsMap.StockNumber,access_token:accessToken, user_id:userId, data:DataWsMap]
+                ]
+                logwsService.createLog(logMap)
+
                 if (resultDealer.data.dealer_id){
+
                     dealerId = resultDealer.data.dealer_id
-                }
-                jsonVehicle = homologaService.homologaData(DataWsMap, userId, dealerId)
 
-                def respApiVehicle = publicaService.createVehicle(jsonVehicle, accessToken)
+                    jsonVehicle = homologaService.homologaData(DataWsMap, userId, dealerId)
 
-                println "El access_token es"+accessToken
-                println "El json que queremos publicar es"+jsonVehicle
-                println "El json de respuesta de la api de vehicle es"+respApiVehicle
-
-                if (respApiVehicle.data.id){
-                    publicaService.postImages(DataWsMap, accessToken, respApiVehicle.data.id)
-                    response = "0 - "+respApiVehicle.data.id
+                    def respApiVehicle = publicaService.createVehicle(jsonVehicle, accessToken)
+                    /*
+                    println "El access_token es"+accessToken
+                    println "El json que queremos publicar es"+jsonVehicle
+                    println "El json de respuesta de la api de vehicle es"+respApiVehicle
+                    */
+                    if (respApiVehicle.data.id){
+                        logMap = [
+                                section:"publication",
+                                user:DataWsMap.User,
+                                description:"Contiene los datos de la publicacion en la api de vehicle",
+                                data:[numInventario:DataWsMap.StockNumber,vehicle_id:respApiVehicle.data.id, user_id:userId]
+                        ]
+                        logwsService.createLog(logMap)
+                        publicaService.postImages(DataWsMap, accessToken, respApiVehicle.data.id)
+                        response = "0 - "+respApiVehicle.data.id
+                    }else{
+                        response = "8 - "+respApiVehicle.data.message
+                    }
                 }else{
-                    response = "8 - "+respApiVehicle.data.message
+                    response = "8 - El usuario no tiene un dealer asociado"
                 }
-
-
-
 
             } else {
-                response = "1 - El usuario y o contraseña no son validos" //"EL usuario y/o contraseña no son validos"
+                response = "1 - El usuario y/o contraseña no son validos"
             }
 
         }

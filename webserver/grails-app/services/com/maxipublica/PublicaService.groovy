@@ -52,11 +52,7 @@ class PublicaService {
         listaImages.each{
             if(it){
                 bodyImagen = homologaService.createJsonImages(it)
-                println "Post Pic= token:${accessToken}, vehicleId:${vehicleId}, json:${bodyImagen}"
                 resultPostImage = restService.postResource("/images/${vehicleId}/", queryParams, bodyImagen)
-                println "Resultado Pic = ${resultPostImage}"
-            }else{
-                println "No hay foto a postear"
             }
         }
 

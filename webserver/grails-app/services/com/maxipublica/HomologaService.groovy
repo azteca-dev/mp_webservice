@@ -70,12 +70,12 @@ class HomologaService {
 
 
 
-    def getAttributes(def TypeCurrency,
-                      def ExteriorColor,
-                      def InteriorColor,
-                      def TypeVestureMPId,
-                      def TypeTransmissionMPId,
-                      def TypeVehicleMPId ){
+    def getAttributes (def TypeCurrency,
+                       def ExteriorColor,
+                       def InteriorColor,
+                       def TypeVestureMPId,
+                       def TypeTransmissionMPId,
+                       def TypeVehicleMPId ){
 
         def jsonAttributes = []
 
@@ -140,6 +140,100 @@ class HomologaService {
         ]
 
         jsonEquipment
+    }
+
+    def validateDataMap( def dataMap){
+
+        Map response = [
+                status:"0",
+                message:"OK"
+        ]
+
+
+        if(!dataMap.User){
+            response.status = "1"
+            response.message = "El Usuario es requerido"
+        }
+        if(!dataMap.Pass){
+            response.status = "1"
+            response.message = "La Contraseña es requerida"
+        }
+
+        if(!dataMap.StockNumber){
+            response.status = "8"
+            response.message = "El NumInventarioEmpresa es requerido"
+        }
+        if(!dataMap.Price){
+            response.status = "8"
+            response.message = "El Precio es requerido"
+        }
+        if(!dataMap.TypeCurrency){
+            response.status = "8"
+            response.message = "El TipoMoneda es requerido"
+        }
+        if(!dataMap.Kilometers){
+            response.status = "8"
+            response.message = "El Kilometraje es requerido"
+        }
+        if(!dataMap.ExteriorColor){
+            response.status = "8"
+            response.message = "El ColorExterior es requerido"
+        }
+        if(!dataMap.InteriorColor){
+            response.status = "8"
+            response.message = "El ColorExterior es requerido"
+        }
+        if(!dataMap.Mark){
+            response.status = "8"
+            response.message = "La Marca es requerida"
+        }
+        if(!dataMap.MarkMPId){
+            response.status = "8"
+            response.message = "La MarcaIDAutoplaza es requerida"
+        }
+        if(!dataMap.Model){
+            response.status = "8"
+            response.message = "El Modelo es requerido"
+        }
+        if(!dataMap.ModelMPId){
+            response.status = "8"
+            response.message = "El ModeloIDAutoplaza es requerido"
+        }
+        if(!dataMap.Version){
+            response.status = "8"
+            response.message = "El Submodelo es requerdio"
+        }
+        if(!dataMap.VersionMPId){
+            response.status = "8"
+            response.message = "El SubmodeloIDAutoplaza es requerido"
+        }
+        if(!dataMap.Year){
+            response.status = "8"
+            response.message = "El Anno es requerido"
+        }
+        if(!dataMap.TypeVehicleMPId){
+            response.status = "8"
+            response.message = "El TipoVehicleIDAutoplaza es requerido"
+        }
+        if(!dataMap.TypeVestureMPId){
+            response.status = "8"
+            response.message = "El TipoVestiduraIDAutoplaza es requerido"
+        }
+        if(!dataMap.TypeTransmissionMPId){
+            response.status = "8"
+            response.message = "El TipoTransmisionIDAutoplaza es requerido"
+        }
+        if(!dataMap.StatusVehicleMPId){
+            response.status = "8"
+            response.message = "El StatusVehiculoIDAutoplaza es requerido"
+        }
+        if(!dataMap.Action){
+            response.status = "8"
+            response.message = "El EventoArealizar es requerido"
+        }
+
+
+        response
     }
 
     /*

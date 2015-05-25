@@ -195,7 +195,7 @@ class WebMaxipublicaService {
                                 section:"publication",
                                 user:DataWsMap.User,
                                 description:"Contiene los datos de la publicacion en la api de vehicle",
-                                data:[numInventario:DataWsMap.StockNumber,vehicle_id:respApiVehicle.data.id, user_id:userId]
+                                data:[numInventario:DataWsMap.StockNumber,vehicle_id:respApiVehicle.data.id, user_id:userId, json_enviado:jsonVehicle]
                         ]
                         logwsService.createLog(logMap)
                         publicaService.postImages(DataWsMap, accessToken, respApiVehicle.data.id)

@@ -83,6 +83,7 @@ class WebMaxipublicaService {
         def response = "0" // el anuncio se publico correctamente
         def accessToken
         def jsonVehicle
+        def jsonVehicleUPD
         def userId
         def dealerId
         def logMap
@@ -182,27 +183,52 @@ class WebMaxipublicaService {
 
                     dealerId = resultDealer.data.dealer_id
 
-                    jsonVehicle = homologaService.homologaData(DataWsMap, userId, dealerId)
+                    def vehicleId = publicaService.searchVehicle(DataWsMap.StockNumber, dealerId)
 
-                    def respApiVehicle = publicaService.createVehicle(jsonVehicle, accessToken)
-                    /*
-                    println "El access_token es"+accessToken
-                    println "El json que queremos publicar es"+jsonVehicle
-                    println "El json de respuesta de la api de vehicle es"+respApiVehicle
-                    */
-                    if (respApiVehicle.data.id){
+
+
+                    if(vehicleId != 0){
+
+                        response = "0 - Actualizamos el vehiculo correctamente"
+                        jsonVehicleUPD = homologaService.homologaDataUpdate(DataWsMap, userId, dealerId)
+
+                        def respUpdApiVehicle = publicaService.updateVehicle(vehicleId, jsonVehicleUPD, accessToken)
                         logMap = [
-                                section:"publication",
+                                section:"update",
                                 user:DataWsMap.User,
-                                description:"Contiene los datos de la publicacion en la api de vehicle",
-                                data:[numInventario:DataWsMap.StockNumber,vehicle_id:respApiVehicle.data.id, user_id:userId, json_enviado:jsonVehicle]
+                                description:"Contiene los datos de la publicacion en la api de vehicle despues del update",
+                                data:[numInventario:DataWsMap.StockNumber,vehicle_id:respUpdApiVehicle.data.id, user_id:userId, json_enviado:jsonVehicleUPD]
                         ]
                         logwsService.createLog(logMap)
-                        publicaService.postImages(DataWsMap, accessToken, respApiVehicle.data.id)
-                        response = "0 - "+respApiVehicle.data.id
+                        try {
+                            publicaService.updateImages(DataWsMap, accessToken, respUpdApiVehicle.data.id)
+                        }catch(Exception e){
+                            response = "0 - Actualizamos el vehiculo, pero no las fotos"
+                        }
+
                     }else{
-                        response = "8 - "+respApiVehicle.data.message
+
+                        jsonVehicle = homologaService.homologaData(DataWsMap, userId, dealerId)
+                        def respApiVehicle = publicaService.createVehicle(jsonVehicle, accessToken)
+
+                        if (respApiVehicle.data.id){
+                            logMap = [
+                                    section:"publication",
+                                    user:DataWsMap.User,
+                                    description:"Contiene los datos de la publicacion en la api de vehicle",
+                                    data:[numInventario:DataWsMap.StockNumber,vehicle_id:respApiVehicle.data.id, user_id:userId, json_enviado:jsonVehicle]
+                            ]
+                            logwsService.createLog(logMap)
+                            publicaService.postImages(DataWsMap, accessToken, respApiVehicle.data.id)
+                            response = "0 - "+respApiVehicle.data.id
+                        }else{
+                            response = "8 - "+respApiVehicle.data.message
+                        }
+
+
                     }
+
+
                 }else{
                     response = "8 - El usuario no tiene un dealer asociado"
                 }
@@ -216,4 +242,68 @@ class WebMaxipublicaService {
         return  response
 
     }
+
+
+    def Borrar_Anuncio(String Usuario, String contraseña, String empresaID, String NumeroInventarioCliente){
+
+        def accessToken
+        def userId
+        def dealerId
+        def response
+
+        if(!Usuario){
+            return "8 - El Usuario es requerido"
+        }
+        if(!contraseña){
+            return "8 - La contraseña es requerida"
+        }
+        if(!NumeroInventarioCliente){
+            return "8 - El NumeroInventarioCliente es requerido"
+        }
+
+        def result = authenticateService.login(Usuario, contraseña)
+
+        if (result.data.access_token) {
+            accessToken = result.data.access_token
+            userId      = result.data.user_id
+            def resultDealer = authenticateService.getDealer(userId, accessToken)
+
+            if (resultDealer.data.dealer_id) {
+
+                dealerId = resultDealer.data.dealer_id
+
+                def vehicleId = publicaService.searchVehicle(NumeroInventarioCliente, dealerId)
+
+                if(vehicleId != 0) {
+
+                    def logMap = [
+                            section:"deleted-publication",
+                            user:Usuario,
+                            description:"Se manda a borrar un vehicle ["+vehicleId+"]",
+                            data:[numInventario:NumeroInventarioCliente,access_token:accessToken, user_id:userId, vehicle_Id:vehicleId]
+                    ]
+                    logwsService.createLog(logMap)
+
+                    def resultDeleted = publicaService.deleteVehicle(vehicleId, accessToken)
+
+                    if(resultDeleted.data.message){
+                        response = "0 - El vehiculo con numero de inventario "+ NumeroInventarioCliente+ "fue borrado"
+                    }else{
+                        response = "0 - Ocurrio un problema con el borrado"
+                    }
+                }else{
+                   response = "2 - El vehiculo con numero de  inventario ya fue borrado o no fue encontrado"
+                }
+
+            }else{
+                response = "8 - El usuario no tiene un dealer asociado"
+            }
+
+        }else {
+            response = "1 - El usuario y/o contraseña no son validos"
+        }
+
+        return response
+    }
+
 }

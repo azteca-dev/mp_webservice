@@ -13,6 +13,13 @@ class HomologaService {
 
     }
 
+    def homologaDataUpdate(def dataMap, def userId, def dealerId){
+
+        def jsonVehicleUPD = createJsonVehicleUPD(dataMap, userId, dealerId)
+
+        jsonVehicleUPD
+    }
+
 
     def createJsonVehicle(def dataMap, def userId, def dealerId) {
 
@@ -64,10 +71,47 @@ class HomologaService {
         jsonVehicleForPost
     }
 
-    def createJsonImages (def urlImage){
+
+    def createJsonVehicleUPD(def dataMap, def userId, def dealerId) {
+
+
+        def jsonVehicleForPut = [
+                kilometers:dataMap.Kilometers,
+                price:dataMap.Price,
+                description:dataMap.Description,
+                attributes:getAttributes(dataMap.TypeCurrency, dataMap.ExteriorColor, dataMap.InteriorColor, dataMap.TypeVestureMPId, dataMap.TypeTransmissionMPId, dataMap.TypeVehicleMPId),
+                equipment:getEquipment()
+
+        ]
+
+        jsonVehicleForPut
+    }
+
+    def createJsonImages (def listImages){
 
         def images = []
-        images << [url:urlImage]
+
+        listImages.each{
+            if(it){
+                images << [url:it]
+            }
+        }
+
+        def jsonImages = [
+                images:images
+        ]
+
+        jsonImages
+    }
+
+    def createJsonImagesDeleted(def mapImages){
+
+        def images = []
+        mapImages.each{
+            if(it){
+                images << [id_images:it.id_images]
+            }
+        }
         def jsonImages = [
                 images:images
         ]
@@ -241,6 +285,10 @@ class HomologaService {
 
         response
     }
+
+    /*
+    TODO crear el metodo para obtener el json para hacer un update al vehicle
+     */
 
     /*
 

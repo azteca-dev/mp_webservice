@@ -21,6 +21,59 @@ class PublicaService {
 
     }
 
+    def updateImages(def dataMap, def accessToken, def vehicleId){
+
+        def queryParams =[
+                access_token: accessToken
+        ]
+
+        def bodyImagen
+        def resultPostImage
+
+        def listaImages=[]
+
+        // por el momento solo podemos modificar 15 imagenes
+        listaImages << dataMap.Pic1
+        listaImages << dataMap.Pic2
+        listaImages << dataMap.Pic3
+        listaImages << dataMap.Pic4
+        listaImages << dataMap.Pic5
+        listaImages << dataMap.Pic6
+        listaImages << dataMap.Pic7
+        listaImages << dataMap.Pic8
+        listaImages << dataMap.Pic9
+        listaImages << dataMap.Pic10
+        listaImages << dataMap.Pic11
+        listaImages << dataMap.Pic12
+        listaImages << dataMap.Pic13
+        listaImages << dataMap.Pic14
+        listaImages << dataMap.Pic15
+
+        if(listaImages.size() > 0) {
+            println "Vamos a actualizar las imagenes"
+            def imagesVehicle = restService.getResource("/images/${vehicleId}")
+            if(imagesVehicle.data.images){
+               def jsonBodyImageDel = homologaService.createJsonImagesDeleted(imagesVehicle.data.images)
+               println "El json a eleiminar es"+jsonBodyImageDel
+               if(jsonBodyImageDel){
+                   def resultDelImages = restService.deleteResource("/images/${vehicleId}/", queryParams, jsonBodyImageDel)
+                   println "La respuesta del borrado es"+resultDelImages
+                   if(resultDelImages){
+                       println "ahora vamos a postear la nueva imagen"
+                       bodyImagen = homologaService.createJsonImages(listaImages)
+                       resultPostImage = restService.postResource("/images/${vehicleId}/", queryParams, bodyImagen)
+                   }
+               }
+
+            }else{
+                println "ahora vamos a postear las imagenes por qu eno tenia"
+                bodyImagen = homologaService.createJsonImages(listaImages)
+                resultPostImage = restService.postResource("/images/${vehicleId}/", queryParams, bodyImagen)
+            }
+        }
+
+    }
+
     def postImages(def dataMap, def accessToken, def vehicleId){
 
         def queryParams =[
@@ -49,12 +102,55 @@ class PublicaService {
         listaImages << dataMap.Pic14
         listaImages << dataMap.Pic15
 
-        listaImages.each{
-            if(it){
-                bodyImagen = homologaService.createJsonImages(it)
-                resultPostImage = restService.postResource("/images/${vehicleId}/", queryParams, bodyImagen)
+        if(listaImages.size() > 0) {
+            bodyImagen = homologaService.createJsonImages(listaImages)
+            resultPostImage = restService.postResource("/images/${vehicleId}/", queryParams, bodyImagen)
+        }
+
+
+    }
+
+    def searchVehicle(def stockNumber, def dealerId){
+
+        def queryParams =[
+                stock_number:stockNumber,
+                dealer_id:dealerId
+        ]
+        def vehicleId = 0
+
+        def result = restService.getResource("/vehicle/search/", queryParams)
+
+        if (result.data.total > 0){
+            result.data.results.each{
+                vehicleId = it.id
             }
         }
 
+        vehicleId
     }
+
+    def updateVehicle(def vehicleId, def jsonUpdate, def accessToken){
+
+        def queryParams = [
+                access_token:accessToken
+        ]
+
+        def result = restService.putResource("/vehicle/${vehicleId}", queryParams, jsonUpdate )
+
+    }
+
+
+
+    def deleteVehicle(def vehicleId, def accessToken){
+
+        def queryParams = [
+                access_token:accessToken
+        ]
+
+        def result = restService.deleteResource("/vehicle/${vehicleId}/", queryParams)
+
+        result
+    }
+
+
 }

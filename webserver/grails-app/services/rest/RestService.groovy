@@ -175,7 +175,92 @@ class RestService {
         }
 
         result
+    }
+
+    def putResource(def resource,def query, def body){
+        Map result = [:]
+        try {
+
+            def resp = restClient.put(
+                    path : resource,
+                    body : body,
+                    query: query,
+                    requestContentType : 'application/json' )
+
+
+            result.status = resp.status
+            result.data = resp.data
+
+
+
+        }catch (HttpResponseException e){
+            def dataMap = [
+                    error:e.response.responseData.error,
+                    message:e.response.responseData.message
+            ]
+            result.status   = e.response.responseData.status
+            result.data     = dataMap
+        }
 
         result
+    }
+
+    def deleteResource(def resource, def query, def body){
+
+        Map result = [:]
+        try {
+
+            println "vamos a borrar con el metodo del del rest client"+resource+'-'+query+'-'+body
+            def resp = restClient.delete(
+                    path    : resource,
+                    query   : query,
+                    body    : body,
+                    requestContentType :'application/json')
+
+            println "El resultado del request es"+result
+            result.status = resp.status
+            result.data = resp.data
+
+        }catch(HttpResponseException e){
+
+            def dataMap = [
+                    error:e.response.responseData.error,
+                    message:e.response.responseData.message
+            ]
+            result.status   = e.response.responseData.status
+            result.data     = dataMap
+
+        }catch(Exception e){
+            println "!! :( Entonces cual es al exception"+e
+        }
+        result
+
+    }
+
+    def deleteResource(def resource, def query){
+
+        Map result = [:]
+        try {
+
+            def resp = restClient.delete(
+                    path    : resource,
+                    query   : query,
+                    requestContentType :'application/json')
+
+            result.status = resp.status
+            result.data = resp.data
+
+        }catch(HttpResponseException e){
+
+            def dataMap = [
+                    error:e.response.responseData.error,
+                    message:e.response.responseData.message
+            ]
+            result.status   = e.response.responseData.status
+            result.data     = dataMap
+
+        }
+        result
+
     }
 }

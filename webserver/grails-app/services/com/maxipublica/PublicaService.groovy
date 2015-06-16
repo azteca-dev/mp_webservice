@@ -3,6 +3,8 @@ package com.maxipublica
 import grails.transaction.Transactional
 import rest.RestService
 
+import javax.servlet.http.HttpServletResponse
+
 @Transactional
 class PublicaService {
 
@@ -50,23 +52,17 @@ class PublicaService {
         listaImages << dataMap.Pic15
 
         if(listaImages.size() > 0) {
-            println "Vamos a actualizar las imagenes"
+
             def imagesVehicle = restService.getResource("/images/${vehicleId}")
             if(imagesVehicle.data.images){
-               def jsonBodyImageDel = homologaService.createJsonImagesDeleted(imagesVehicle.data.images)
-               println "El json a eleiminar es"+jsonBodyImageDel
-               if(jsonBodyImageDel){
-                   def resultDelImages = restService.deleteResource("/images/${vehicleId}/", queryParams, jsonBodyImageDel)
-                   println "La respuesta del borrado es"+resultDelImages
-                   if(resultDelImages){
-                       println "ahora vamos a postear la nueva imagen"
+                   def resultDelImages = restService.deleteResource("/images/${vehicleId}/", queryParams)
+                   if(resultDelImages.status == HttpServletResponse.SC_OK){
                        bodyImagen = homologaService.createJsonImages(listaImages)
                        resultPostImage = restService.postResource("/images/${vehicleId}/", queryParams, bodyImagen)
                    }
-               }
 
             }else{
-                println "ahora vamos a postear las imagenes por qu eno tenia"
+
                 bodyImagen = homologaService.createJsonImages(listaImages)
                 resultPostImage = restService.postResource("/images/${vehicleId}/", queryParams, bodyImagen)
             }

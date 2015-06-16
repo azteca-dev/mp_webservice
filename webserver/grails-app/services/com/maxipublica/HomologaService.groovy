@@ -104,22 +104,6 @@ class HomologaService {
         jsonImages
     }
 
-    def createJsonImagesDeleted(def mapImages){
-
-        def images = []
-        mapImages.each{
-            if(it){
-                images << [id_images:it.id_images]
-            }
-        }
-        def jsonImages = [
-                images:images
-        ]
-        jsonImages
-    }
-
-
-
     def getAttributes (def TypeCurrency,
                        def ExteriorColor,
                        def InteriorColor,

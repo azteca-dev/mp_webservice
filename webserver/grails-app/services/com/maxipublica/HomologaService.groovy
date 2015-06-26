@@ -338,6 +338,11 @@ class HomologaService {
        def resultAttribute = Dictionaryws.findByGroupIdAndGroupNameAndTypeAndSiteAndValueIdSite(groupId,
        groupName, type, site, valueSite.toString())
 
-       resultAttribute.valueIdMXP
+
+       if(resultAttribute){
+           resultAttribute.valueIdMXP
+       }else{
+          return null
+       }
     }
 }

@@ -9,13 +9,7 @@ class HomologaService {
     def homologaData(def dataMap, def userId, def dealerId) {
 
         def dataMapProcess = processIdMXP(dataMap)
-
-
-
-        println "EL json procesado para las marcas es"+dataMapProcess
-
-
-        def jsonVehicle = [] //createJsonVehicle(dataMapProcess, userId, dealerId)
+        def jsonVehicle = createJsonVehicle(dataMapProcess, userId, dealerId)
 
         jsonVehicle
 
@@ -23,7 +17,8 @@ class HomologaService {
 
     def homologaDataUpdate(def dataMap, def userId, def dealerId){
 
-        def jsonVehicleUPD = createJsonVehicleUPD(dataMap, userId, dealerId)
+        def dataMapProcess = processIdMXP(dataMap)
+        def jsonVehicleUPD = createJsonVehicleUPD(dataMapProcess, userId, dealerId)
 
         jsonVehicleUPD
     }
@@ -55,7 +50,7 @@ class HomologaService {
                 price:dataMap.Price,
                 description:dataMap.Description,
                 number_plate:"NO",
-                condition:dataMap.StatusVehicleMPId,
+                condition:'usado', //dataMap.StatusVehicleMPId,
                 dealer:[
                         dealer_ID:dealerId,
                         seller_contact:[
@@ -66,7 +61,7 @@ class HomologaService {
 
                 ],
                 attributes:getAttributes(dataMap.TypeCurrency, dataMap.ExteriorColor, dataMap.InteriorColor, dataMap.TypeVestureMPId, dataMap.TypeTransmissionMPId, dataMap.TypeVehicleMPId),
-                equipment:getEquipment(),
+                equipment:getEquipment(dataMap.Equipment),
                 published_sites:[
                         mercadoLibre:[
                                 publish:"true",
@@ -88,7 +83,7 @@ class HomologaService {
                 price:dataMap.Price,
                 description:dataMap.Description,
                 attributes:getAttributes(dataMap.TypeCurrency, dataMap.ExteriorColor, dataMap.InteriorColor, dataMap.TypeVestureMPId, dataMap.TypeTransmissionMPId, dataMap.TypeVehicleMPId),
-                equipment:getEquipment()
+                equipment:getEquipment(dataMap.Equipment)
 
         ]
 
@@ -153,44 +148,56 @@ class HomologaService {
         jsonAttributes
     }
 
-    def getEquipment(){
+    def getEquipment(def ids){
 
-        /*
-        String groupId      = 'attributes_group'
-        String groupName    = 'Ficha Tecnica'
-        String site         = 'APC'
+        List listId = []
+        if(ids){
+          def listIds = ids.split('@')
+            listIds.each{
+                listId.add(it.toString())
+            }
+        }
 
-        def resultAttribute = Dictionaryws.findByGroupIdAndGroupNameAndTypeAndSiteAndValueIdSite(groupId,
-                groupName, type, site, valueSite.toString())
-                */
+        def jsonEquipment = [:]
+        def classifiedsGruops = []
 
 
-        def jsonEquipment = [
+        String type = 'ACC'
+        String site = 'APC'
 
-                id:"equipment_group",
-                label:"Equipamiento",
-                electric_group:[
-                        id:"electric_group",
-                        label:"Equipo eléctrico",
-                        power_mirrors:[
-                                id:"power_mirrors",
-                                label:"Espejos laterales"
-                        ],
-                        power_door_locks:[
-                                id:"power_door_locks",
-                                label:"Seguros"
-                        ]
-                ],
-                security_group:[
-                        id:"security_group",
-                        label:"Seguridad",
-                        disc_brakes:[
-                                id:"disc_brakes",
-                                label:"Frenos de disco traseros"
-                        ]
-                ]
+        def resultEquipment = Dictionaryws.findAllByTypeAndSiteAndValueIdSiteInList(type, site, listId )
 
-        ]
+        if(resultEquipment){
+
+            jsonEquipment.id = "equipment_group"
+            jsonEquipment.label = 'Equipamiento'
+
+            resultEquipment.each{
+                if(!classifiedsGruops.contains(it.groupId)){
+                    classifiedsGruops.add(it.groupId)
+                }
+            }
+
+            classifiedsGruops.each{ groups ->
+
+                jsonEquipment."${groups}" = [:]
+                jsonEquipment."${groups}".id = groups
+
+
+                resultEquipment.each{
+                    if(it.groupId == groups) {
+                        if(!jsonEquipment."${groups}"."${it.valueIdMXP}"){
+                            jsonEquipment."${groups}"."${it.valueIdMXP}" = [:]
+                        }
+                        jsonEquipment."${groups}"."${it.valueIdMXP}".id = "${it.valueIdMXP}"
+                    }
+                }
+
+            }
+
+        }else{
+            jsonEquipment=[:]
+        }
 
         jsonEquipment
     }

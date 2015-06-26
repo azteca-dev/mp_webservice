@@ -1,13 +1,21 @@
 package com.maxipublica
 
 import grails.transaction.Transactional
+import maxipublica.Dictionaryws
 
 @Transactional
 class HomologaService {
 
     def homologaData(def dataMap, def userId, def dealerId) {
 
-        def jsonVehicle = createJsonVehicle(dataMap, userId, dealerId)
+        def dataMapProcess = processIdMXP(dataMap)
+
+
+
+        println "EL json procesado para las marcas es"+dataMapProcess
+
+
+        def jsonVehicle = [] //createJsonVehicle(dataMapProcess, userId, dealerId)
 
         jsonVehicle
 
@@ -146,6 +154,17 @@ class HomologaService {
     }
 
     def getEquipment(){
+
+        /*
+        String groupId      = 'attributes_group'
+        String groupName    = 'Ficha Tecnica'
+        String site         = 'APC'
+
+        def resultAttribute = Dictionaryws.findByGroupIdAndGroupNameAndTypeAndSiteAndValueIdSite(groupId,
+                groupName, type, site, valueSite.toString())
+                */
+
+
         def jsonEquipment = [
 
                 id:"equipment_group",
@@ -270,35 +289,48 @@ class HomologaService {
         response
     }
 
-    /*
-    TODO crear el metodo para obtener el json para hacer un update al vehicle
-     */
+    def processIdMXP ( def dataMap){
 
-    /*
+        dataMap.MarkMPId    = processCatalog("MAR", dataMap.MarkMPId)
+        dataMap.ModelMPId   = processCatalog("MOD", dataMap.ModelMPId)
+        dataMap.VersionMPId = processCatalog("VER", dataMap.VersionMPId)
 
 
-                user_type: 'normal',
-                //tags: tags,
-                email: account.email.trim().toLowerCase(),
-                password: account.password.trim(),
-                phone: [
-                        area_code: "",
-                        number: account.phone.replaceAll("[^\\s0-9().\\-\\*\\/\\#\\+]+\$", "")
-                ],
-                country_id: "MX",
-                site_id: "MLM",
-                company: [
-                        corporate_name: "",
-                        corporate_identification: ""
-                ],
-                city: account.address.ciudad,
-                //state: findStateId(account.address.estado),
-                address: account.address.calle,
-                identification: [
-                        type: account.rfc ? "RFC" : "",
-                        number: account.rfc
-                ],
-                context: context << [pending_registration: "override"],
-                confirmed_registration: true
-     */
+        def typeCurrency        = processAttributes('CURRENCIE',dataMap.TypeCurrency)
+        def exteriorColor       = processAttributes('COLOREXT', dataMap.ExteriorColor)
+        def interiorColor       = processAttributes('COLORINT', dataMap.InteriorColor)
+        def typeVestureId       = processAttributes('VESTURE', dataMap.TypeVestureMPId)
+        def typeTransmissionId  = processAttributes('TRANSMISION', dataMap.TypeTransmissionMPId)
+        def typeVehicleId       = processAttributes('BODY', dataMap.TypeVehicleMPId)
+
+        dataMap.TypeCurrency            = typeCurrency ? typeCurrency : 'CURRENCIE-MXN'
+        dataMap.ExteriorColor           = exteriorColor ? exteriorColor : 'COLOREXT-OTRO'
+        dataMap.InteriorColor           = interiorColor ? interiorColor : 'COLORINT-OTRO'
+        dataMap.TypeVestureMPId         = typeVestureId ? typeVestureId : 'VESTURE-OTRO'
+        dataMap.TypeTransmissionMPId    = typeTransmissionId ? typeTransmissionId : 'TRANS-AUTOMATICA'
+        dataMap.TypeVehicleMPId         = typeVehicleId ? typeVehicleId : 'BODY-SEDAN'
+
+
+
+
+        dataMap
+
+    }
+
+    def processCatalog (def nivel, def value){
+        value = (value.contains(nivel)) ? value : nivel+value
+        value
+    }
+
+    def processAttributes(String type, def valueSite ){
+
+       String groupId      = 'attributes_group'
+       String groupName    = 'Ficha Tecnica'
+       String site         = 'APC'
+
+       def resultAttribute = Dictionaryws.findByGroupIdAndGroupNameAndTypeAndSiteAndValueIdSite(groupId,
+       groupName, type, site, valueSite.toString())
+
+       resultAttribute.valueIdMXP
+    }
 }

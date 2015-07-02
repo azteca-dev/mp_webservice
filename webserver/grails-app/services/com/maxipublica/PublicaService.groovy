@@ -17,7 +17,7 @@ class PublicaService {
                 access_token:accessToken
         ]
 
-        def result = restService.postResource("/vehicle/", queryParams, jsonVehicle)
+        def result = restService.postResource("/vehicletest/", queryParams, jsonVehicle)
 
         result
 
@@ -114,7 +114,7 @@ class PublicaService {
         ]
         def vehicleId = 0
 
-        def result = restService.getResource("/vehicle/search/", queryParams)
+        def result = restService.getResource("/vehicletest/search/", queryParams)
 
         if (result.data.total > 0){
             result.data.results.each{
@@ -131,7 +131,7 @@ class PublicaService {
                 access_token:accessToken
         ]
 
-        def result = restService.putResource("/vehicle/${vehicleId}", queryParams, jsonUpdate )
+        def result = restService.putResource("/vehicletest/${vehicleId}", queryParams, jsonUpdate )
 
     }
 
@@ -143,7 +143,7 @@ class PublicaService {
                 access_token:accessToken
         ]
 
-        def result = restService.deleteResource("/vehicle/${vehicleId}/", queryParams)
+        def result = restService.deleteResource("/vehicletest/${vehicleId}/", queryParams)
 
         result
     }

@@ -1,4 +1,4 @@
-environments {
+/*environments {
     development {
         grails {
             mongo {
@@ -27,4 +27,40 @@ environments {
             }
         }
     }
+}*/
+environments {
+   development {
+       grails {
+           mongo {
+               host = 'ds045082-a0.mongolab.com' 
+               port = '45082' 
+               username = '4mxp_multi_connect' 
+               password = 'Pre.M4xianuncios'
+               databaseName = 'premaxipublica'
+           }
+       }
+   }
+   test {
+       grails {
+           mongo {
+               host = 'ds045082-a0.mongolab.com' 
+               port = '45082' 
+               username = '4mxp_multi_connect' 
+               password = 'Pre.M4xianuncios'
+               databaseName = 'premaxipublica'
+               
+           }
+       }
+   }
+   production {
+       grails {
+           mongo {
+               host = 'ds045082-a0.mongolab.com' 
+               port = '45082' 
+               username = '4mxp_multi_connect' 
+               password = 'Pre.M4xianuncios'
+               databaseName = 'premaxipublica'
+           }
+       }
+   }
 }

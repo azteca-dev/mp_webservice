@@ -63,8 +63,13 @@ class HomologaService {
                 attributes:getAttributes(dataMap.TypeCurrency, dataMap.ExteriorColor, dataMap.InteriorColor, dataMap.TypeVestureMPId, dataMap.TypeTransmissionMPId, dataMap.TypeVehicleMPId),
                 equipment:getEquipment(dataMap.Equipment),
                 published_sites:[
-                        mercadoLibre:[
+                        /*mercadoLibre:[
                                 publish:"true",
+                                official_store_id:"235"
+                        ]*/
+                        mlm:[
+                                status:"waiting",
+                                action:"to_publish",
                                 official_store_id:"235"
                         ]
                 ]

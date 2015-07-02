@@ -27,7 +27,8 @@ class RestService {
 
     //def grailsApplication = new DefaultGrailsApplication()
 
-    def urlBase        =  'http://api.maxipublica.com:9091' //grailsApplication.config.domainMain
+    //def urlBase        =  'http://api.maxipublica.com:9091' //grailsApplication.config.domainMain
+    def urlBase        =  'http://pre.maxipublica.com' //grailsApplication.config.domainMain
 
     def restClient  = new RESTClient(urlBase)
 

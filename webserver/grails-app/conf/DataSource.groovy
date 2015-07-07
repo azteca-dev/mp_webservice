@@ -1,66 +1,35 @@
-/*environments {
+environments {
     development {
         grails {
             mongo {
-                host = "localhost"
-                databaseName = "mp_ws"
+                host = 'localhost'
+                port = '27017'
+                username = ''
+                password = ''
+                databaseName = 'mp_werservice'
             }
         }
     }
-    test {
+    /*test {
         grails {
             mongo {
-                host = "localhost"
-                databaseName = "mp_ws"
+                host = 'ds055962-a0.mongolab.com'
+                port = '55962'
+                username = '4mxp_multi_connect'
+                password = 'Pre.M4xianuncios'
+                databaseName = 'premaxipublica'
             }
         }
     }
     production {
         grails {
             mongo {
-
-                // replicaSet = []
-                host = "localhost"
-                username = ""
-                password = ""
-                databaseName = "mp_ws"
+                host = 'ds055962-a0.mongolab.com'
+                port = '55962'
+                username = '4mxp_multi_connect'
+                password = 'Pre.M4xianuncios'
+                databaseName = 'premaxipublica'
             }
         }
-    }
-}*/
-environments {
-   development {
-       grails {
-           mongo {
-               host = 'ds045082-a0.mongolab.com' 
-               port = '45082' 
-               username = '4mxp_multi_connect' 
-               password = 'Pre.M4xianuncios'
-               databaseName = 'premaxipublica'
-           }
-       }
-   }
-   test {
-       grails {
-           mongo {
-               host = 'ds045082-a0.mongolab.com' 
-               port = '45082' 
-               username = '4mxp_multi_connect' 
-               password = 'Pre.M4xianuncios'
-               databaseName = 'premaxipublica'
-               
-           }
-       }
-   }
-   production {
-       grails {
-           mongo {
-               host = 'ds045082-a0.mongolab.com' 
-               port = '45082' 
-               username = '4mxp_multi_connect' 
-               password = 'Pre.M4xianuncios'
-               databaseName = 'premaxipublica'
-           }
-       }
-   }
+    }*/
 }

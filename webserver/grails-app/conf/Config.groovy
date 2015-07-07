@@ -89,11 +89,11 @@ environments {
     development {
         grails.logging.jul.usebridge = true
 
-        domainMain = 'http://api.maxipublica.com:9091'
+        domainMain = 'http://api2.maxipublica.com:9091'
     }
     production {
         grails.logging.jul.usebridge = false
-        domainMain = 'http://api.maxipublica.com:9091'
+        domainMain = 'http://api2.maxipublica.com:9091'
         // TODO: grails.serverURL = "http://www.changeme.com"
     }
 }
@@ -118,3 +118,4 @@ log4j.main = {
            'org.hibernate',
            'net.sf.ehcache.hibernate'
 }
+grails.config.locations = ["file:/usr/local/tomcat8/lib/con.groovy"]

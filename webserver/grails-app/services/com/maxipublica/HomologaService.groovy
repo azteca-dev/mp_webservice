@@ -101,13 +101,15 @@ class HomologaService {
 
         listImages.each{
             if(it){
-                images << [url:it]
+                images.add("url":it)
             }
         }
 
         def jsonImages = [
                 images:images
         ]
+
+        println jsonImages
 
         jsonImages
     }

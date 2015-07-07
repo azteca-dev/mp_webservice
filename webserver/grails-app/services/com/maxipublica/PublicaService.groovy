@@ -106,9 +106,10 @@ class PublicaService {
 
     }
 
-    def searchVehicle(def stockNumber, def dealerId){
+    def searchVehicle(def stockNumber, def dealerId, def accessToken){
 
         def queryParams =[
+                access_token:accessToken,
                 stock_number:stockNumber,
                 dealer_id:dealerId
         ]

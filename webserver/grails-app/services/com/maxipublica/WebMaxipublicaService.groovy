@@ -183,7 +183,7 @@ class WebMaxipublicaService {
 
                     dealerId = resultDealer.data.dealer_id
 
-                    def vehicleId = publicaService.searchVehicle(DataWsMap.StockNumber, dealerId)
+                    def vehicleId = publicaService.searchVehicle(DataWsMap.StockNumber, dealerId, accessToken)
 
 
 
@@ -272,7 +272,7 @@ class WebMaxipublicaService {
 
                 dealerId = resultDealer.data.dealer_id
 
-                def vehicleId = publicaService.searchVehicle(NumeroInventarioCliente, dealerId)
+                def vehicleId = publicaService.searchVehicle(NumeroInventarioCliente, dealerId, accessToken)
 
                 if(vehicleId != 0) {
 

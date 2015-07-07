@@ -1,5 +1,6 @@
 package com.maxipublica
 
+import com.wstoapi.PublicaService
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 

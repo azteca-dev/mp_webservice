@@ -1,4 +1,4 @@
-package com.maxipublica
+package com.wstoapi
 
 import grails.transaction.Transactional
 

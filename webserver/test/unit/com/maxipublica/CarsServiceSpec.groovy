@@ -1,5 +1,6 @@
 package com.maxipublica
 
+import com.wstoapi.CarsService
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 

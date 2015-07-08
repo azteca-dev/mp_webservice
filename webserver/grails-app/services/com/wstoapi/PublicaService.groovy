@@ -36,20 +36,20 @@ class PublicaService {
 
         // por el momento solo podemos modificar 15 imagenes
         if(dataMap.Pic1){listaImages.add(dataMap.Pic1)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic2)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic3)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic4)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic5)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic6)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic7)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic8)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic9)}
-        if(dataMap.Pic1){listaImages.add( dataMap.Pic10)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic11)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic12)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic13)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic14)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic15)}
+        if(dataMap.Pic2){listaImages.add(dataMap.Pic2)}
+        if(dataMap.Pic3){listaImages.add(dataMap.Pic3)}
+        if(dataMap.Pic4){listaImages.add(dataMap.Pic4)}
+        if(dataMap.Pic5){listaImages.add(dataMap.Pic5)}
+        if(dataMap.Pic6){listaImages.add(dataMap.Pic6)}
+        if(dataMap.Pic7){listaImages.add(dataMap.Pic7)}
+        if(dataMap.Pic8){listaImages.add(dataMap.Pic8)}
+        if(dataMap.Pic9){listaImages.add(dataMap.Pic9)}
+        if(dataMap.Pic10){listaImages.add( dataMap.Pic10)}
+        if(dataMap.Pic11){listaImages.add(dataMap.Pic11)}
+        if(dataMap.Pic12){listaImages.add(dataMap.Pic12)}
+        if(dataMap.Pic13){listaImages.add(dataMap.Pic13)}
+        if(dataMap.Pic14){listaImages.add(dataMap.Pic14)}
+        if(dataMap.Pic15){listaImages.add(dataMap.Pic15)}
 
         if(listaImages.size() > 0) {
 
@@ -83,20 +83,20 @@ class PublicaService {
 
         // por el momento solo podemos enviar 15 imagenes
         if(dataMap.Pic1){listaImages.add(dataMap.Pic1)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic2)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic3)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic4)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic5)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic6)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic7)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic8)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic9)}
-        if(dataMap.Pic1){listaImages.add( dataMap.Pic10)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic11)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic12)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic13)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic14)}
-        if(dataMap.Pic1){listaImages.add(dataMap.Pic15)}
+        if(dataMap.Pic2){listaImages.add(dataMap.Pic2)}
+        if(dataMap.Pic3){listaImages.add(dataMap.Pic3)}
+        if(dataMap.Pic4){listaImages.add(dataMap.Pic4)}
+        if(dataMap.Pic5){listaImages.add(dataMap.Pic5)}
+        if(dataMap.Pic6){listaImages.add(dataMap.Pic6)}
+        if(dataMap.Pic7){listaImages.add(dataMap.Pic7)}
+        if(dataMap.Pic8){listaImages.add(dataMap.Pic8)}
+        if(dataMap.Pic9){listaImages.add(dataMap.Pic9)}
+        if(dataMap.Pic10){listaImages.add( dataMap.Pic10)}
+        if(dataMap.Pic11){listaImages.add(dataMap.Pic11)}
+        if(dataMap.Pic12){listaImages.add(dataMap.Pic12)}
+        if(dataMap.Pic13){listaImages.add(dataMap.Pic13)}
+        if(dataMap.Pic14){listaImages.add(dataMap.Pic14)}
+        if(dataMap.Pic15){listaImages.add(dataMap.Pic15)}
 
         println "el size del array de imagenes es"+listaImages.size() + "-"+listaImages
 

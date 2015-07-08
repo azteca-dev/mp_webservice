@@ -88,7 +88,7 @@ class HomologaService {
                 price:dataMap.Price,
                 description:dataMap.Description,
                 attributes:getAttributes(dataMap.TypeCurrency, dataMap.ExteriorColor, dataMap.InteriorColor, dataMap.TypeVestureMPId, dataMap.TypeTransmissionMPId, dataMap.TypeVehicleMPId),
-                equipment:getEquipment(dataMap.Equipment),
+                equipment:getEquipment(dataMap.Equipment)
 
 
         ]

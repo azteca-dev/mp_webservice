@@ -14,10 +14,10 @@ class CarsService {
 
     def Publicar_Anuncio(
 
-            String Usuario,
-            String Contraseña,
+            String usuario,
+            String contrasenna,
             String NumInventarioEmpresa,
-            String Descripcion,
+            String DescripconAuto,
             String Precio,
             String TipoMoneda,
             String Tipo_PrecioIDAutoplaza,
@@ -38,7 +38,7 @@ class CarsService {
             String TipoTransmisionIDAutoplaza,
             String StatusVehiculoIDAutoplaza,
             String EmpresaIDAutoplaza,
-            String EmpresaIDInterno,
+            String EmpresaIDinterno,
             String AutoBlindado,
             String AutoAccidentadoRecuperado,
             String NumSerieAuto,
@@ -80,7 +80,7 @@ class CarsService {
 
     ) {
 
-        def response = "0" // el anuncio se publico correctamente
+        def response = "0"
         def accessToken
         def jsonVehicle
         def jsonVehicleUPD
@@ -91,10 +91,10 @@ class CarsService {
 
         def DataWsMap = [
 
-                User                    : Usuario,
-                Pass                    : Contraseña,
+                User                    : usuario,
+                Pass                    : contrasenna,
                 StockNumber             : NumInventarioEmpresa,
-                Description             : Descripcion,
+                Description             : DescripconAuto,
                 Price                   : Precio,
                 TypeCurrency            : TipoMoneda,
                 TypePriceMPId           : Tipo_PrecioIDAutoplaza,
@@ -115,7 +115,7 @@ class CarsService {
                 TypeTransmissionMPId    : TipoTransmisionIDAutoplaza,
                 StatusVehicleMPId       : StatusVehiculoIDAutoplaza,
                 DealerMPId              : EmpresaIDAutoplaza,
-                DealerIntId             : EmpresaIDInterno,
+                DealerIntId             : EmpresaIDinterno,
                 VehicleArmour           : AutoBlindado,
                 VehicleAccidentRecovered: AutoAccidentadoRecuperado,
                 NumSerie                : NumSerieAuto,
@@ -163,7 +163,7 @@ class CarsService {
             response = validateData.status+"-"+validateData.message
         }else {
 
-            def result = authenticateService.login(Usuario, Contraseña)
+            def result = authenticateService.login(DataWsMap.User, DataWsMap.Pass)
 
             if (result.data.access_token) {
                 accessToken = result.data.access_token
@@ -248,24 +248,32 @@ class CarsService {
     }
 
 
-    def Borrar_Anuncio(String Usuario, String contraseña, String empresaID, String NumeroInventarioCliente){
+    def Borrar_Anuncio(String usuario, String contraseña, String empresaID_, String NumInventarioCliente){
+
+        def dataMap = [
+                usuario:usuario,
+                pass:contraseña,
+                dealerId:empresaID_,
+                stockNumber:NumInventarioCliente
+        ]
+
 
         def accessToken
         def userId
         def dealerId
         def response
 
-        if(!Usuario){
+        if(!dataMap.usuario){
             return "8 - El Usuario es requerido"
         }
-        if(!contraseña){
+        if(!dataMap.pass){
             return "8 - La contraseña es requerida"
         }
-        if(!NumeroInventarioCliente){
+        if(!dataMap.stockNumber){
             return "8 - El NumeroInventarioCliente es requerido"
         }
 
-        def result = authenticateService.login(Usuario, contraseña)
+        def result = authenticateService.login(dataMap.usuario, dataMap.pass)
 
         if (result.data.access_token) {
             accessToken = result.data.access_token
@@ -276,22 +284,22 @@ class CarsService {
 
                 dealerId = resultDealer.data.dealer_id
 
-                def vehicleId = publicaService.searchVehicle(NumeroInventarioCliente, dealerId, accessToken)
+                def vehicleId = publicaService.searchVehicle(dataMap.stockNumber, dealerId, accessToken)
 
                 if(vehicleId != 0) {
 
                     def logMap = [
                             section:"deleted-publication",
-                            user:Usuario,
+                            user:dataMap.usuario,
                             description:"Se manda a borrar un vehicle ["+vehicleId+"]",
-                            data:[numInventario:NumeroInventarioCliente,access_token:accessToken, user_id:userId, vehicle_Id:vehicleId]
+                            data:[numInventario:dataMap.stockNumber,access_token:accessToken, user_id:userId, vehicle_Id:vehicleId]
                     ]
                     logwsService.createLog(logMap)
 
                     def resultDeleted = publicaService.deleteVehicle(vehicleId, accessToken)
 
                     if(resultDeleted.data.message){
-                        response = "0 - El vehiculo con numero de inventario "+ NumeroInventarioCliente+ "fue borrado"
+                        response = "0 - El vehiculo con numero de inventario "+ dataMap.stockNumber+ "fue borrado"
                     }else{
                         response = "0 - Ocurrio un problema con el borrado"
                     }

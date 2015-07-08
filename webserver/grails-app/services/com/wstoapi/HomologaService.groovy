@@ -110,7 +110,6 @@ class HomologaService {
                 images:images
         ]
 
-        println jsonImages
 
         jsonImages
     }

@@ -98,7 +98,6 @@ class PublicaService {
         if(dataMap.Pic14){listaImages.add(dataMap.Pic14)}
         if(dataMap.Pic15){listaImages.add(dataMap.Pic15)}
 
-        println "el size del array de imagenes es"+listaImages.size() + "-"+listaImages
 
         if(listaImages.size() > 0) {
             bodyImagen = homologaService.createJsonImages(listaImages)

@@ -25,10 +25,10 @@ class RestService {
 
     static transactional = true
 
-    //def grailsApplication = new DefaultGrailsApplication()
+    def grailsApplication = new DefaultGrailsApplication()
 
-    def urlBase        =  'http://api2.maxipublica.com:9091' //grailsApplication.config.domainMain
-    //def urlBase        =  'http://pre.maxipublica.com' //grailsApplication.config.domainMain
+
+    def urlBase        =  grailsApplication.config.domainMain
 
     def restClient  = new RESTClient(urlBase)
 

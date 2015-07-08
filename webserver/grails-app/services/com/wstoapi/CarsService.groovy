@@ -208,21 +208,25 @@ class CarsService {
 
                     }else{
 
-                        jsonVehicle = homologaService.homologaData(DataWsMap, userId, dealerId)
-                        def respApiVehicle = publicaService.createVehicle(jsonVehicle, accessToken)
+                        try{
+                            jsonVehicle = homologaService.homologaData(DataWsMap, userId, dealerId)
+                            def respApiVehicle = publicaService.createVehicle(jsonVehicle, accessToken)
 
-                        if (respApiVehicle.data.id){
-                            logMap = [
-                                    section:"publication",
-                                    user:DataWsMap.User,
-                                    description:"Contiene los datos de la publicacion en la api de vehicle",
-                                    data:[numInventario:DataWsMap.StockNumber,vehicle_id:respApiVehicle.data.id, user_id:userId, json_enviado:jsonVehicle]
-                            ]
-                            logwsService.createLog(logMap)
-                            publicaService.postImages(DataWsMap, accessToken, respApiVehicle.data.id)
-                            response = "0 - "+respApiVehicle.data.id
-                        }else{
-                            response = "8 - "+respApiVehicle.data.message
+                            if (respApiVehicle.data.id){
+                                logMap = [
+                                        section:"publication",
+                                        user:DataWsMap.User,
+                                        description:"Contiene los datos de la publicacion en la api de vehicle",
+                                        data:[numInventario:DataWsMap.StockNumber,vehicle_id:respApiVehicle.data.id, user_id:userId, json_enviado:jsonVehicle]
+                                ]
+                                logwsService.createLog(logMap)
+                                publicaService.postImages(DataWsMap, accessToken, respApiVehicle.data.id, respApiVehicle.data)
+                                response = "0 - "+respApiVehicle.data.id
+                            }else{
+                                response = "8 - "+respApiVehicle.data.message
+                            }
+                        }catch(Exception e){
+                            response = "-1 - No se pudo hacer el update con vehicle sin fotos error:"+e.message.toString()
                         }
 
 

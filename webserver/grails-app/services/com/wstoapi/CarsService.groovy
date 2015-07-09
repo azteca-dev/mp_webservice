@@ -265,7 +265,7 @@ class CarsService {
 
                             if(respUpdApiVehicle.status == HttpServletResponse.SC_OK || respUpdApiVehicle.status == HttpServletResponse.SC_CREATED ) {
                                 response = "0 - Actualizamos el vehiculo correctamente"
-                                logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, respUpdApiVehicle, Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
+                                logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [ status:respUpdApiVehicle.status], Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
                                 logwsService.createLog(logMap)
                             }else{
                                 response = "8 - No pudimos actualizar el vehiculo"
@@ -275,8 +275,12 @@ class CarsService {
 
 
                         try {
-                            publicaService.updateImages(DataWsMap, accessToken, respUpdApiVehicle.data.id)
-                            logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [:], Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
+                            def respUpdateImages = publicaService.updateImages(DataWsMap, accessToken, respUpdApiVehicle.data.id)
+                            if(respUpdApiVehicle == HttpServletResponse.SC_CREATED || respUpdApiVehicle.status == HttpServletResponse.SC_OK) {
+                                logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, respUpdateImages, Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
+                            }else{
+                                logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, respUpdateImages, Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
+                            }
                             logwsService.createLog(logMap)
                         }catch(Exception e){
                             response = "0 - Actualizamos el vehiculo, pero no las fotos"
@@ -292,10 +296,16 @@ class CarsService {
 
                             if (respApiVehicle.data.id){
                                 response = "0 - "+respApiVehicle.data.id
-                                logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, respApiVehicle, Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_INSERT, userId, dealerId, respApiVehicle.data.id, '')
+                                logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, [status:respApiVehicle.status], Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_INSERT, userId, dealerId, respApiVehicle.data.id, '')
                                 logwsService.createLog(logMap)
-                                //TODO agregar un log para el post de imagenes
-                                publicaService.postImages(DataWsMap, accessToken, respApiVehicle.data.id, respApiVehicle.data)
+    
+                                def respImagesProcess = publicaService.postImages(DataWsMap, accessToken, respApiVehicle.data.id, respApiVehicle.data)
+                                if(respImagesProcess.status == HttpServletResponse.SC_OK || respImagesProcess.status == HttpServletResponse.SC_CREATED ){
+                                    logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, respImagesProcess, Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_INSERT, userId, dealerId, respApiVehicle.data.id, '')
+                                }else{
+                                    logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, respImagesProcess, Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_INSERT, userId, dealerId, respApiVehicle.data.id, '')
+                                }
+                                logwsService.createLog(logMap)
                             }else{
                                 response = "8 - "+respApiVehicle.data.message
                                 logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin, response, respApiVehicle, Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_INSERT, userId, dealerId, '', '')

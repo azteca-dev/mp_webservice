@@ -30,7 +30,7 @@ class PublicaService {
         ]
 
         def bodyImagen
-        def resultPostImage
+        def resultUpdateImage
 
         def listaImages=[]
 
@@ -58,26 +58,35 @@ class PublicaService {
                    def resultDelImages = restService.deleteResource("/images/${vehicleId}/", queryParams)
                    if(resultDelImages.status == HttpServletResponse.SC_OK){
                        bodyImagen = homologaService.createJsonImages(listaImages)
-                       resultPostImage = restService.postResource("/images/${vehicleId}/", queryParams, bodyImagen)
+                       resultUpdateImage = restService.postResource("/images/${vehicleId}/", queryParams, bodyImagen)
                    }
 
             }else{
 
                 bodyImagen = homologaService.createJsonImages(listaImages)
-                resultPostImage = restService.postResource("/images/${vehicleId}/", queryParams, bodyImagen)
+                resultUpdateImage = restService.postResource("/images/${vehicleId}/", queryParams, bodyImagen)
             }
+        }else{
+            resultPostImage = [
+                    status:HttpServletResponse.SC_NOT_FOUND,
+                    message: "No se enviaron fotos en la actualización"
+            ]
         }
+
+        resultUpdateImage
 
     }
 
     def postImages(def dataMap, def accessToken, def vehicleId, def jsonPostVehicle){
 
+
+
         def queryParams =[
                 access_token: accessToken
         ]
 
-        def bodyImagen
         def resultPostImage
+        def bodyImagen
 
         def listaImages=[]
 
@@ -106,10 +115,14 @@ class PublicaService {
         else{
 
             def respUpdApiVehicle = updateVehicle(vehicleId, jsonPostVehicle, accessToken)
-            if(!respUpdApiVehicle.data.id){
-                throw new Exception('No se pudo actualizar el vehiculo sin fotos')
-            }
+
+            resultPostImage = [
+                    status:HttpServletResponse.SC_NOT_FOUND,
+                    message:'Se envió sin fotos'
+            ]
         }
+
+        resultPostImage
 
 
     }

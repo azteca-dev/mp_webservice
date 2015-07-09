@@ -66,7 +66,7 @@ class LogwsService {
         logMap
     }
 
-    // TODO aqui aplicamos el paginado y todo lo que necesitan
+
     def getLogs(def params){
 
         Map jsonResult = [:]
@@ -86,30 +86,73 @@ class LogwsService {
         def SEARCH_PARAMS_MAP = [
                 status:"response.status",
                 date_from:"dateRegistered",
-                date_to : "dateRegistered"
+                date_to : "dateRegistered",
+                order_by_id:"order_id",
+                order_by_date:"orderDateRegistered"
         ]
+
+
+        def featuresQueryMap =[
+                sort:"dateRegistered",
+                order:"desc",
+                offset:offset,
+                max:limit
+        ]
+
+        if(params.order_by_id){
+            if(params.order_by_id != 'desc' && params.order_by_id != 'asc'){
+                throw new BadRequestException('The allowed values for the field order_by_id are [desc, asc] ')
+            }
+        }
+
+        if(params.order_by_date){
+
+            if(params.order_by_date != 'desc' && params.order_by_date != 'asc'){
+                throw new BadRequestException('The allowed values for the field order_by_date are [desc, asc] ')
+            }
+        }
 
         params.each{ key , value ->
             def newKey = SEARCH_PARAMS_MAP[key]
             if(newKey){
                 queryMap[newKey] = value
+                if(newKey == 'order_id'){
+
+                    featuresQueryMap =[
+                            sort:"_id",
+                            order:value,
+                            offset:offset,
+                            max:limit
+                    ]
+                }
+                if(newKey == 'orderDateRegistered'){
+
+                    featuresQueryMap =[
+                            sort:"dateRegistered",
+                            order:value,
+                            offset:offset,
+                            max:limit
+                    ]
+                }
             }
         }
+
+
 
         def logwsCriteria = Logws.createCriteria()
 
 
         if(!queryMap){
-            logsResults = logwsCriteria.list(sort:"dateRegistered", order:"desc", offset:offset, max:limit){
+            logsResults = logwsCriteria.list(featuresQueryMap){
             }
         }else{
 
-            logsResults = logwsCriteria.list(sort:"dateRegistered", order:"desc", offset:offset, max:limit){
+            logsResults = logwsCriteria.list(featuresQueryMap){
 
                 params.each{ key, value ->
 
                     def newKey = SEARCH_PARAMS_MAP[key]
-                    if(newKey && (newKey!='dateRegistered')){
+                    if(newKey && (newKey!='dateRegistered' && newKey!='order_id' && newKey!='orderDateRegistered')){
                         eq(newKey, value)
                     }
                 }
@@ -127,7 +170,7 @@ class LogwsService {
                 if(params.date_to){
                     try{
                         date_to = ISODateTimeFormat.dateTimeParser().parseDateTime(params.date_to).toDate()
-                        le("registrationDate", date_to)
+                        le("dateRegistered", date_to)
                     }catch(Exception e){
                         throw new BadRequestException("Wrong date format in date_to. Must be ISO json format")
                     }
@@ -148,10 +191,11 @@ class LogwsService {
             logResults.add(
                     id:it.id,
                     action:it.action,
+                    date:it.dateRegistered,
                     origin:it.origin,
                     response:it.response,
-                    tech:it.tech,
-                    date:it.dateRegistered
+                    tech:it.tech
+
             )
 
         }
@@ -162,9 +206,6 @@ class LogwsService {
         jsonResult.results = logResults
 
         jsonResult
-
-        /*def logwsResult = Logws.findAll()
-        logwsResult*/
 
     }
 }

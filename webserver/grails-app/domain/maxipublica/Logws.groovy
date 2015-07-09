@@ -4,17 +4,15 @@ class Logws {
 
     static constraints = {
 
-        section nullable:false, blank:false
-        user    nullable:false, blank:false
-        description nullable: true, blank:true
+        action nullable: false, blank:false, inList: ['insert', 'update', 'delete', 'begin']
 
     }
 
-    String  section
-    String  user
-    String  description
-    Map     data
-    Date    dateRegistered = new Date()
+    String action
+    Map origin          = [:]
+    Map response        = [:]
+    Map tech            = [:]
+    Date dateRegistered = new Date()
 
 
 }

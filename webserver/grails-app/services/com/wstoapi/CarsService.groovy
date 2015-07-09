@@ -2,6 +2,11 @@ package com.wstoapi
 
 import grails.transaction.Transactional
 
+import org.codehaus.groovy.grails.web.util.WebUtils
+
+import javax.servlet.http.HttpServletResponse
+
+
 @Transactional
 class CarsService {
 
@@ -88,6 +93,71 @@ class CarsService {
         def dealerId
         def logMap
 
+        def dataLogMapOrigin =[
+
+                usuario                     : usuario,
+                contrasenna                 : contrasenna,
+                NumInventarioEmpresa        : NumInventarioEmpresa,
+                DescripconAuto              : DescripconAuto,
+                Precio                      : Precio,
+                TipoMoneda                  : TipoMoneda,
+                Tipo_PrecioIDAutoplaza      : Tipo_PrecioIDAutoplaza,
+                Kilometraje                 : Kilometraje,
+                Tipo_KilometrajeIDAutoplaza : Tipo_KilometrajeIDAutoplaza,
+                ColorExterior               : ColorExterior,
+                ColorInterior               : ColorInterior,
+                Marca                       : Marca,
+                MarcaIDAutoplaza            : MarcaIDAutoplaza,
+                Modelo                      : Modelo,
+                ModeloIDAutoplaza           : ModeloIDAutoplaza,
+                Submodelo                   : Submodelo,
+                SubmodeloIDInterno          : SubmodeloIDInterno,
+                SubmodeloIDAutoplaza        : SubmodeloIDAutoplaza,
+                Anno                        : Anno,
+                TipoVehiculoIDAutoplaza     : TipoVehiculoIDAutoplaza,
+                TipoVestiduraIDAutoplaza    : TipoVestiduraIDAutoplaza,
+                TipoTransmisionIDAutoplaza  : TipoTransmisionIDAutoplaza,
+                StatusVehiculoIDAutoplaza   : StatusVehiculoIDAutoplaza,
+                EmpresaIDAutoplaza          : EmpresaIDAutoplaza,
+                EmpresaIDinterno            : EmpresaIDinterno,
+                AutoBlindado                : AutoBlindado,
+                AutoAccidentadoRecuperado   : AutoAccidentadoRecuperado,
+                NumSerieAuto                : NumSerieAuto,
+                Equipamiento                : Equipamiento,
+                UrlFoto1                    : UrlFoto1,
+                UrlFoto2                    : UrlFoto2,
+                UrlFoto3                    : UrlFoto3,
+                UrlFoto4                    : UrlFoto4,
+                UrlFoto5                    : UrlFoto5,
+                UrlFoto6                    : UrlFoto6,
+                UrlFoto7                    : UrlFoto7,
+                UrlFoto8                    : UrlFoto8,
+                UrlFoto9                    : UrlFoto9,
+                UrlFoto10                   : UrlFoto10,
+                UrlFoto11                   : UrlFoto11,
+                UrlFoto12                   : UrlFoto12,
+                UrlFoto13                   : UrlFoto13,
+                UrlFoto14                   : UrlFoto14,
+                UrlFoto15                   : UrlFoto15,
+                UrlFoto16                   : UrlFoto16,
+                UrlFoto17                   : UrlFoto17,
+                UrlFoto18                   : UrlFoto18,
+                UrlFoto19                   : UrlFoto19,
+                UrlFoto20                   : UrlFoto20,
+                UrlFoto21                   : UrlFoto21,
+                UrlFoto22                   : UrlFoto22,
+                UrlFoto23                   : UrlFoto23,
+                UrlFoto24                   : UrlFoto24,
+                UrlFoto25                   : UrlFoto25,
+                UrlFoto26                   : UrlFoto26,
+                UrlFoto27                   : UrlFoto27,
+                UrlFoto28                   : UrlFoto28,
+                UrlFoto29                   : UrlFoto29,
+                UrlFoto30                   : UrlFoto30,
+                UrlFoto31                   : UrlFoto31,
+                UrlFoto32                   : UrlFoto32,
+                EventoArealizar             : EventoArealizar
+        ]
 
         def DataWsMap = [
 
@@ -156,11 +226,22 @@ class CarsService {
 
         ]
 
-        def validateData = homologaService.validateDataMap(DataWsMap)
 
+        String remoteAddress
+        try{
+            def request = WebUtils.retrieveGrailsWebRequest().getCurrentRequest()
+            remoteAddress = request.getRemoteAddr()
+        }catch(Exception e){
+            remoteAddress = 'sin_direccion'
+        }
+
+        def validateData = homologaService.validateDataMap(DataWsMap)
 
         if(validateData.status != "0"){
             response = validateData.status+"-"+validateData.message
+            logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, [:], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_BEGIN, '', '', '', '')
+            logwsService.createLog(logMap)
+
         }else {
 
             def result = authenticateService.login(DataWsMap.User, DataWsMap.Pass)
@@ -170,40 +251,37 @@ class CarsService {
                 userId      = result.data.user_id
                 def resultDealer = authenticateService.getDealer(userId, accessToken)
 
-
-                logMap = [
-                        section:"pre-publication",
-                        user:DataWsMap.User,
-                        description:"Contiene los datos iniciales antes de enviar a la api de vehicle de maxipublica",
-                        data:[numInventario:DataWsMap.StockNumber,access_token:accessToken, user_id:userId, data:DataWsMap]
-                ]
-                logwsService.createLog(logMap)
-
                 if (resultDealer.data.dealer_id){
 
                     dealerId = resultDealer.data.dealer_id
-
                     def vehicleId = publicaService.searchVehicle(DataWsMap.StockNumber, dealerId, accessToken)
-
 
 
                     if(vehicleId != 0){
 
-                        response = "0 - Actualizamos el vehiculo correctamente"
-                        jsonVehicleUPD = homologaService.homologaDataUpdate(DataWsMap, userId, dealerId)
 
-                        def respUpdApiVehicle = publicaService.updateVehicle(vehicleId, jsonVehicleUPD, accessToken)
-                        logMap = [
-                                section:"update",
-                                user:DataWsMap.User,
-                                description:"Contiene los datos de la publicacion en la api de vehicle despues del update",
-                                data:[numInventario:DataWsMap.StockNumber,vehicle_id:respUpdApiVehicle.data.id, user_id:userId, json_enviado:jsonVehicleUPD]
-                        ]
-                        logwsService.createLog(logMap)
+                            jsonVehicleUPD = homologaService.homologaDataUpdate(DataWsMap, userId, dealerId)
+                            def respUpdApiVehicle = publicaService.updateVehicle(vehicleId, jsonVehicleUPD, accessToken)
+
+                            if(respUpdApiVehicle.status == HttpServletResponse.SC_OK || respUpdApiVehicle.status == HttpServletResponse.SC_CREATED ) {
+                                response = "0 - Actualizamos el vehiculo correctamente"
+                                logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, respUpdApiVehicle, Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
+                                logwsService.createLog(logMap)
+                            }else{
+                                response = "8 - No pudimos actualizar el vehiculo"
+                                logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, respUpdApiVehicle, Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
+                                logwsService.createLog(logMap)
+                            }
+
+
                         try {
                             publicaService.updateImages(DataWsMap, accessToken, respUpdApiVehicle.data.id)
+                            logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [:], Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
+                            logwsService.createLog(logMap)
                         }catch(Exception e){
                             response = "0 - Actualizamos el vehiculo, pero no las fotos"
+                            logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [:], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
+                            logwsService.createLog(logMap)
                         }
 
                     }else{
@@ -213,32 +291,37 @@ class CarsService {
                             def respApiVehicle = publicaService.createVehicle(jsonVehicle, accessToken)
 
                             if (respApiVehicle.data.id){
-                                logMap = [
-                                        section:"publication",
-                                        user:DataWsMap.User,
-                                        description:"Contiene los datos de la publicacion en la api de vehicle",
-                                        data:[numInventario:DataWsMap.StockNumber,vehicle_id:respApiVehicle.data.id, user_id:userId, json_enviado:jsonVehicle]
-                                ]
-                                logwsService.createLog(logMap)
-                                publicaService.postImages(DataWsMap, accessToken, respApiVehicle.data.id, respApiVehicle.data)
                                 response = "0 - "+respApiVehicle.data.id
+                                logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, respApiVehicle, Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_INSERT, userId, dealerId, respApiVehicle.data.id, '')
+                                logwsService.createLog(logMap)
+                                //TODO agregar un log para el post de imagenes
+                                publicaService.postImages(DataWsMap, accessToken, respApiVehicle.data.id, respApiVehicle.data)
                             }else{
                                 response = "8 - "+respApiVehicle.data.message
+                                logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin, response, respApiVehicle, Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_INSERT, userId, dealerId, '', '')
+                                logwsService.createLog(logMap)
                             }
                         }catch(Exception e){
                             response = "-1 - No se pudo hacer el update con vehicle sin fotos error:"+e.message.toString()
+                            logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [:], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_UPDATE, userId, dealerId, '', '')
+                            logwsService.createLog(logMap)
                         }
-
 
                     }
 
 
                 }else{
+
                     response = "8 - El usuario no tiene un dealer asociado"
+                    logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, resultDealer, Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_BEGIN, '', '', '', '')
+                    logwsService.createLog(logMap)
                 }
 
             } else {
+
                 response = "1 - El usuario y/o contraseña no son validos"
+                logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, result, Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_BEGIN, '', '', '', '')
+                logwsService.createLog(logMap)
             }
 
         }
@@ -249,6 +332,14 @@ class CarsService {
 
 
     def Borrar_Anuncio(String usuario, String contraseña, String empresaID_, String NumInventarioCliente){
+
+
+        def dataLogMapOrigin =[
+                usuario:usuario,
+                contraseña:contraseña,
+                empresaID_:empresaID_,
+                NumInventarioCliente:NumInventarioCliente
+        ]
 
         def dataMap = [
                 usuario:usuario,
@@ -262,15 +353,33 @@ class CarsService {
         def userId
         def dealerId
         def response
+        def logMap
+
+        String remoteAddress
+        try{
+            def request = WebUtils.retrieveGrailsWebRequest().getCurrentRequest()
+            remoteAddress = request.getRemoteAddr()
+        }catch(Exception e){
+            remoteAddress = 'sin_direccion'
+        }
 
         if(!dataMap.usuario){
-            return "8 - El Usuario es requerido"
+            response = "8 - El Usuario es requerido"
+            logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin, response, [:], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_DELETE, '', '', '', '')
+            logwsService.createLog(logMap)
+            return response
         }
         if(!dataMap.pass){
-            return "8 - La contraseña es requerida"
+            response = "8 - La contraseña es requerida"
+            logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin, response, [:], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_DELETE, '', '', '', '')
+            logwsService.createLog(logMap)
+            return response
         }
         if(!dataMap.stockNumber){
-            return "8 - El NumeroInventarioCliente es requerido"
+            response = "8 - El NumeroInventarioCliente es requerido"
+            logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin, response, [:], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_DELETE, '', '', '', '')
+            logwsService.createLog(logMap)
+            return response
         }
 
         def result = authenticateService.login(dataMap.usuario, dataMap.pass)
@@ -288,31 +397,33 @@ class CarsService {
 
                 if(vehicleId != 0) {
 
-                    def logMap = [
-                            section:"deleted-publication",
-                            user:dataMap.usuario,
-                            description:"Se manda a borrar un vehicle ["+vehicleId+"]",
-                            data:[numInventario:dataMap.stockNumber,access_token:accessToken, user_id:userId, vehicle_Id:vehicleId]
-                    ]
-                    logwsService.createLog(logMap)
-
                     def resultDeleted = publicaService.deleteVehicle(vehicleId, accessToken)
 
                     if(resultDeleted.data.message){
                         response = "0 - El vehiculo con numero de inventario "+ dataMap.stockNumber+ "fue borrado"
+                        logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin, response, resultDeleted, Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_DELETE, userId, dealerId, vehicleId, '')
+                        logwsService.createLog(logMap)
                     }else{
                         response = "0 - Ocurrio un problema con el borrado"
+                        logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin, response, resultDeleted, Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_DELETE, userId, dealerId, vehicleId, '')
+                        logwsService.createLog(logMap)
                     }
                 }else{
                    response = "2 - El vehiculo con numero de  inventario ya fue borrado o no fue encontrado"
+                   logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin, response, [:], Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_DELETE, userId, dealerId, vehicleId, '')
+                   logwsService.createLog(logMap)
                 }
 
             }else{
                 response = "8 - El usuario no tiene un dealer asociado"
+                logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin, response, resultDealer, Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_DELETE, userId, '', '', '')
+                logwsService.createLog(logMap)
             }
 
         }else {
             response = "1 - El usuario y/o contraseña no son validos"
+            logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin, response, [:], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_DELETE, '', '', '', '')
+            logwsService.createLog(logMap)
         }
 
         return response

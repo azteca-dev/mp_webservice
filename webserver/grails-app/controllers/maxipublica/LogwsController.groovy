@@ -10,7 +10,7 @@ class LogwsController {
 
         def result
         try{
-            result = logwsService.getLogs()
+            result = logwsService.getLogs(params)
             render result as JSON
         }catch(Exception e){
             def mapException =[

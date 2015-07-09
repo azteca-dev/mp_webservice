@@ -13,4 +13,7 @@ class Constants {
     static final String LOG_ACTION_UPDATE = 'update'
     static final String LOG_ACTION_DELETE = 'delete'
 
+    static final int DEFAULT_SEARCH_LIMIT = 10
+    static final int MAX_SEARCH_LIMIT = 50
+
 }

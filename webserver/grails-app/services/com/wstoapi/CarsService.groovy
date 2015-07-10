@@ -4,6 +4,7 @@ import grails.transaction.Transactional
 
 import org.codehaus.groovy.grails.web.util.WebUtils
 
+import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 
@@ -84,6 +85,49 @@ class CarsService {
 
 
     ) {
+
+        // TODO eliminar estas trazas [INICIO] .... ......
+        def requestCliente = WebUtils.retrieveGrailsWebRequest().getCurrentRequest()
+
+        println "Lo que recibimos es hola:"
+        println "QueryString---> "+requestCliente.getQueryString()
+        println "headerNames---> "+requestCliente.headerNames
+        println "parts---> "+requestCliente.parts
+        println "method---> "+requestCliente.method
+        println "requestURL---> "+requestCliente.requestURL
+        println "ContentLenght---> "+requestCliente.contentLength
+        println "ContentType---> "+requestCliente.contentType
+        println "MetaPropertiesValues---> "+requestCliente.metaPropertyValues
+
+
+        println "getRequestUrl--->"+requestCliente.getRequestURL()
+        println "getAttributes(javax.servlet.forward.request_uri)--->"+requestCliente.getAttribute("javax.servlet.forward.request_uri")
+        println "getAttribute(javax.servlet.forward.query_string)--->"+requestCliente.getAttribute("javax.servlet.forward.query_string")
+        println "User-Agent--->"+requestCliente.getHeader("User-Agent")
+        println "getServletPath()--->"+requestCliente.getServletPath()
+        println "getContentType()--->"+requestCliente.getContentType()
+
+        println "getParameterMap()--->"+requestCliente.getParameterMap()
+
+        println "getProtocol()--->"+requestCliente.getProtocol()
+        println "getScheme()--->"+requestCliente.getScheme()
+
+        println "getParameterNames()--->"+requestCliente.getParameterNames()
+
+
+
+
+
+        requestCliente.getAttributeNames().each{
+            println "getAttributeNames--->>>"+it
+        }
+
+        println "Request Complete!! ..."
+        requestCliente.each{
+            println "--"+it
+        }
+
+        // TODO eliminar estas trazas [FIN] .... ......
 
         def response = "0"
         def accessToken
@@ -298,7 +342,7 @@ class CarsService {
                                 response = "0 - "+respApiVehicle.data.id
                                 logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, [status:respApiVehicle.status], Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_INSERT, userId, dealerId, respApiVehicle.data.id, '')
                                 logwsService.createLog(logMap)
-    
+
                                 def respImagesProcess = publicaService.postImages(DataWsMap, accessToken, respApiVehicle.data.id, respApiVehicle.data)
                                 if(respImagesProcess.status == HttpServletResponse.SC_OK || respImagesProcess.status == HttpServletResponse.SC_CREATED ){
                                     logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, respImagesProcess, Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_INSERT, userId, dealerId, respApiVehicle.data.id, '')

@@ -2,22 +2,28 @@ package com.wstoapi
 
 import grails.transaction.Transactional
 import maxipublica.Dictionaryws
+import rest.RestService
+
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
 @Transactional
 class HomologaService {
 
-    def homologaData(def dataMap, def userId, def dealerId) {
+    def restService = new RestService()
 
-        def dataMapProcess = processIdMXP(dataMap)
+    def homologaData(def dataMap, def userId, def dealerId, def accessToken) {
+
+        def dataMapProcess = processIdMXP(dataMap, accessToken)
         def jsonVehicle = createJsonVehicle(dataMapProcess, userId, dealerId)
 
         jsonVehicle
 
     }
 
-    def homologaDataUpdate(def dataMap, def userId, def dealerId){
+    def homologaDataUpdate(def dataMap, def userId, def dealerId, def accessToken){
 
-        def dataMapProcess = processIdMXP(dataMap)
+        def dataMapProcess = processIdMXP(dataMap, accessToken)
         def jsonVehicleUPD = createJsonVehicleUPD(dataMapProcess, userId, dealerId)
 
         jsonVehicleUPD
@@ -303,11 +309,15 @@ class HomologaService {
         response
     }
 
-    def processIdMXP ( def dataMap){
+    def processIdMXP ( def dataMap, def accessToken){
 
         dataMap.MarkMPId    = processCatalog("MAR", dataMap.MarkMPId)
         dataMap.ModelMPId   = processCatalog("MOD", dataMap.ModelMPId)
         dataMap.VersionMPId = processCatalog("VER", dataMap.VersionMPId)
+
+        if(dataMap.VersionMPId == 'VER-1'){
+            dataMap.VersionMPId = getVersionNotCatalog(dataMap.ModelMPId, dataMap.Year,accessToken )
+        }
 
 
         def typeCurrency        = processAttributes('CURRENCIE',dataMap.TypeCurrency)
@@ -334,6 +344,54 @@ class HomologaService {
     def processCatalog (def nivel, def value){
         value = (value.contains(nivel)) ? value : nivel+value
         value
+    }
+
+
+    def getVersionNotCatalog(def modeloId, def valueYear, def accessToken){
+
+
+        def versionId = "-1"
+        def yearId = getYearIdFromModeloAndYear(modeloId, valueYear, accessToken)
+        if(yearId != "0"){
+            def versiones = getCategoryCatalog(yearId, accessToken)
+            if(versiones.status == HttpServletResponse.SC_OK){
+                versionId = versiones.data.children_categories[0].category_id
+            }
+        }
+
+        versionId
+
+    }
+
+    def getYearIdFromModeloAndYear(def modeloId, def valueYear, def accessToken){
+
+
+        def yearId = "0"
+        def result = getCategoryCatalog(modeloId, accessToken)
+
+        if (result.status == HttpServletResponse.SC_OK){
+            result.data.children_categories.each{
+                 if(it.name == valueYear){
+                     yearId = it.category_id
+                 }
+            }
+        }
+
+        yearId
+
+    }
+
+
+    def getCategoryCatalog(def categoryId, def accessToken){
+
+        def queryParams = [
+                access_token:accessToken
+        ]
+
+
+        def result = restService.getResource("/catalog/MX/MLM/${categoryId}/", queryParams)
+
+        result
     }
 
     def processAttributes(String type, def valueSite ){

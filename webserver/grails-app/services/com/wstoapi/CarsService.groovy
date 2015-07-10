@@ -35,8 +35,8 @@ class CarsService {
             String Modelo,
             String ModeloIDAutoplaza,
             String Submodelo,
-            //String SubmodeloIDInterno,
-            //String SubmodeloIDAutoplaza,
+            String SubmodeloIDInterno,
+            String SubmodeloIDAutoplaza,
             String Anno,
             String TipoVehiculoIDAutoplaza,
             String TipoVestiduraIDAutoplaza,
@@ -113,8 +113,8 @@ class CarsService {
                 Modelo                      : Modelo,
                 ModeloIDAutoplaza           : ModeloIDAutoplaza,
                 Submodelo                   : Submodelo,
-                SubmodeloIDInterno          : "",//SubmodeloIDInterno,
-                SubmodeloIDAutoplaza        : "",//SubmodeloIDAutoplaza,
+                SubmodeloIDInterno          : SubmodeloIDInterno,
+                SubmodeloIDAutoplaza        : SubmodeloIDAutoplaza,
                 Anno                        : Anno,
                 TipoVehiculoIDAutoplaza     : TipoVehiculoIDAutoplaza,
                 TipoVestiduraIDAutoplaza    : TipoVestiduraIDAutoplaza,
@@ -179,8 +179,8 @@ class CarsService {
                 Model                   : Modelo,
                 ModelMPId               : ModeloIDAutoplaza,
                 Version                 : Submodelo,
-                VersionIntId            : "",//SubmodeloIDInterno,
-                VersionMPId             : "",//SubmodeloIDAutoplaza,
+                VersionIntId            : SubmodeloIDInterno,
+                VersionMPId             : SubmodeloIDAutoplaza,
                 Year                    : Anno,
                 TypeVehicleMPId         : TipoVehiculoIDAutoplaza,
                 TypeVestureMPId         : TipoVestiduraIDAutoplaza,
@@ -261,8 +261,8 @@ class CarsService {
 
                     if(vehicleId != 0){
 
+                            jsonVehicleUPD = homologaService.homologaDataUpdate(DataWsMap, userId, dealerId, accessToken)
 
-                            jsonVehicleUPD = homologaService.homologaDataUpdate(DataWsMap, userId, dealerId)
                             def respUpdApiVehicle = publicaService.updateVehicle(vehicleId, jsonVehicleUPD, accessToken)
 
                             if(respUpdApiVehicle.status == HttpServletResponse.SC_OK || respUpdApiVehicle.status == HttpServletResponse.SC_CREATED ) {
@@ -293,7 +293,7 @@ class CarsService {
                     }else{
 
                         try{
-                            jsonVehicle = homologaService.homologaData(DataWsMap, userId, dealerId)
+                            jsonVehicle = homologaService.homologaData(DataWsMap, userId, dealerId, accessToken)
                             def respApiVehicle = publicaService.createVehicle(jsonVehicle, accessToken)
 
                             if (respApiVehicle.data.id){

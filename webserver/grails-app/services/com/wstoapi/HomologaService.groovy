@@ -315,7 +315,7 @@ class HomologaService {
         dataMap.ModelMPId   = processCatalog("MOD", dataMap.ModelMPId)
         dataMap.VersionMPId = processCatalog("VER", dataMap.VersionMPId)
 
-        if(dataMap.VersionMPId == 'VER-1'){
+        if(!existsVersionCatalog(dataMap.VersionMPId, accessToken)){
             dataMap.VersionMPId = getVersionNotCatalog(dataMap.ModelMPId, dataMap.Year,accessToken )
         }
 
@@ -346,6 +346,17 @@ class HomologaService {
         value
     }
 
+
+    def existsVersionCatalog (def versionId, def accessToken){
+
+        def getResutlVersion = getCategoryCatalog(versionId, accessToken)
+
+        if(getResutlVersion.status == HttpServletResponse.SC_OK){
+            return true
+        }else{
+            return false
+        }
+    }
 
     def getVersionNotCatalog(def modeloId, def valueYear, def accessToken){
 

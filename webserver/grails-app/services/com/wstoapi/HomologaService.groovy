@@ -75,8 +75,8 @@ class HomologaService {
                         ]*/
                         mlm:[
                                 status:"waiting",
-                                action:"to_publish",
-                                official_store_id:"235"
+                                action:"to_publish"
+                                //official_store_id:"235" Lo quitamos por peticion de Erick que le dijo Miguel 14-07-2015
                         ]
                 ]
 

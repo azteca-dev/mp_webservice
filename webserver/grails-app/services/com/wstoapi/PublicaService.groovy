@@ -114,6 +114,15 @@ class PublicaService {
         }
         else{
 
+
+            jsonPostVehicle.published_sites = [mlm:[
+                    status:"waiting",
+                    action:"to_publish"
+                    //official_store_id:"235" Lo quitamos por peticion de Erick que le dijo Miguel 14-07-2015
+            ]]
+
+            jsonPostVehicle << [origin_update:"webservice"]
+
             def respUpdApiVehicle = updateVehicle(vehicleId, jsonPostVehicle, accessToken)
 
             resultPostImage = [

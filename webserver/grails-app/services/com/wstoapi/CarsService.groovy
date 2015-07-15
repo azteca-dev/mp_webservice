@@ -262,7 +262,6 @@ class CarsService {
                     if(vehicleId != 0){
 
                             jsonVehicleUPD = homologaService.homologaDataUpdate(DataWsMap, userId, dealerId, accessToken)
-
                             def respUpdApiVehicle = publicaService.updateVehicle(vehicleId, jsonVehicleUPD, accessToken)
 
                             if(respUpdApiVehicle.status == HttpServletResponse.SC_OK || respUpdApiVehicle.status == HttpServletResponse.SC_CREATED ) {

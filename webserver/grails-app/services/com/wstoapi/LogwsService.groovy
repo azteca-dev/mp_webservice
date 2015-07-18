@@ -78,6 +78,7 @@ class LogwsService {
         def date_from
         def date_to
 
+        //Redondea el offset a un numero entero y si no puede lo deja en 0
         def offset  = params.offset ? Integer.parseInt(params.offset) : 0
         def limit   = params.limit ? Integer.parseInt(params.limit):Constants.DEFAULT_SEARCH_LIMIT
 
@@ -88,10 +89,14 @@ class LogwsService {
                 date_from:"dateRegistered",
                 date_to : "dateRegistered",
                 order_by_id:"order_id",
-                order_by_date:"orderDateRegistered"
+                order_by_date:"orderDateRegistered",
+                stock_number:"origin.NumInventarioEmpresa",
+                user:"tech.user",
+                usuario:"origin.usuario",
+                action_:"action"
         ]
 
-
+        //parametros de busqueda para el criteria
         def featuresQueryMap =[
                 sort:"dateRegistered",
                 order:"desc",
@@ -99,25 +104,32 @@ class LogwsService {
                 max:limit
         ]
 
+        //Valida que el orden por ID sea con paramatros adecuados
         if(params.order_by_id){
             if(params.order_by_id != 'desc' && params.order_by_id != 'asc'){
                 throw new BadRequestException('The allowed values for the field order_by_id are [desc, asc] ')
             }
         }
 
+        //Valida que el orden por fecha sea con paramatros adecuados
         if(params.order_by_date){
-
             if(params.order_by_date != 'desc' && params.order_by_date != 'asc'){
                 throw new BadRequestException('The allowed values for the field order_by_date are [desc, asc] ')
             }
         }
 
+        //itera cada una de las variables que vienen a travez de la URL variable = valor
         params.each{ key , value ->
+            //Busca la variable en el mapa
             def newKey = SEARCH_PARAMS_MAP[key]
+            //Si encuentra esa variable en el mapa regresa el valor de la key que encontro dentro de ese mapa
             if(newKey){
+                //Asigna el valor de la variable que itera en ese momento a una key nueva que se genera en el mapa de querys
+                //correspondiente al valor que encontro en el SEARCH_PARAMS_MAP
                 queryMap[newKey] = value
+                //queryMap.push(newKey, value)
                 if(newKey == 'order_id'){
-
+                    //parametros de busqueda para el criteria
                     featuresQueryMap =[
                             sort:"_id",
                             order:value,
@@ -126,7 +138,7 @@ class LogwsService {
                     ]
                 }
                 if(newKey == 'orderDateRegistered'){
-
+                    //parametros de busqueda para el criteria
                     featuresQueryMap =[
                             sort:"dateRegistered",
                             order:value,
@@ -153,7 +165,15 @@ class LogwsService {
 
                     def newKey = SEARCH_PARAMS_MAP[key]
                     if(newKey && (newKey!='dateRegistered' && newKey!='order_id' && newKey!='orderDateRegistered')){
-                        eq(newKey, value)
+                      //en dado caso de que no exista ninguna de los parametros establecivos busca por el que se especifica en la newKey
+                        //println newKey
+                        if(newKey.equals("tech.user")){
+                            eq(newKey, Integer.valueOf(value))
+                        }else if(newKey.equals("origin.usuario")){
+                            ilike(newKey, "%"+value+"%")
+                        }else{
+                            eq(newKey, value)
+                        }
                     }
                 }
 

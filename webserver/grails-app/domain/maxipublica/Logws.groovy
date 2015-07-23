@@ -13,6 +13,4 @@ class Logws {
     Map response        = [:]
     Map tech            = [:]
     Date dateRegistered = new Date()
-
-
 }

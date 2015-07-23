@@ -69,7 +69,8 @@ class PublicaService {
         }else{
             resultPostImage = [
                     status:HttpServletResponse.SC_NOT_FOUND,
-                    message: "No se enviaron fotos en la actualización"
+                    message: "No se enviaron fotos en la actualización",
+                    error: "not_found"
             ]
         }
 
@@ -127,7 +128,8 @@ class PublicaService {
 
             resultPostImage = [
                     status:HttpServletResponse.SC_NOT_FOUND,
-                    message:'Se envió sin fotos'
+                    message:'Se envió sin fotos',
+                    error:"not_found"
             ]
         }
 

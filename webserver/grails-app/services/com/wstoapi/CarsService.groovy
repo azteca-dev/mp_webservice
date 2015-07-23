@@ -100,7 +100,7 @@ class CarsService {
                 usuario                     : usuario,
                 contrasenna                 : contrasenna,
                 NumInventarioEmpresa        : NumInventarioEmpresa,
-                DescripconAuto              : "Numinv: " + NumInventarioEmpresa + ", " + DescripconAuto,
+                DescripconAuto              : DescripconAuto,
                 Precio                      : Precio,
                 TipoMoneda                  : TipoMoneda,
                 Tipo_PrecioIDAutoplaza      : Tipo_PrecioIDAutoplaza,
@@ -240,7 +240,7 @@ class CarsService {
         def validateData = homologaService.validateDataMap(DataWsMap)
 
         if(validateData.status != "0"){
-            response = validateData.status+"-"+validateData.message
+            response = validateData.status + " - " + validateData.error + ": " +validateData.message
             logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, [:], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_BEGIN, '', '', '', '')
             logwsService.createLog(logMap)
 
@@ -265,55 +265,60 @@ class CarsService {
                             def respUpdApiVehicle = publicaService.updateVehicle(vehicleId, jsonVehicleUPD, accessToken)
 
                             if(respUpdApiVehicle.status == HttpServletResponse.SC_OK || respUpdApiVehicle.status == HttpServletResponse.SC_CREATED ) {
-                                response = "0 - Actualizamos el vehiculo correctamente"
+                                response = "200 - successfull: stock_number - " + (respUpdApiVehicle.data.stock_number ? respUpdApiVehicle.data.stock_number : "") + ", ws_id - " + (respUpdApiVehicle.data.id ? respUpdApiVehicle.data.id : "") + ". Actualizamos el vehiculo correctamente"
                                 logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [ status:respUpdApiVehicle.status], Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
                                 logwsService.createLog(logMap)
                             }else{
-                                response = "8 - No pudimos actualizar el vehiculo"
-                                logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, respUpdApiVehicle, Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
+                                response = "400 - bad_request: stock_number - " + (respUpdApiVehicle.data.stock_number ? respUpdApiVehicle.data.stock_number : "") + ", ws_id - " + (respUpdApiVehicle.data.id ? respUpdApiVehicle.data.id : "")  + ". No pudimos actualizar el vehiculo"
+                                logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [ status:respUpdApiVehicle.status], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
                                 logwsService.createLog(logMap)
                             }
-
-
                         try {
                             def respUpdateImages = publicaService.updateImages(DataWsMap, accessToken, respUpdApiVehicle.data.id)
                             if(respUpdApiVehicle == HttpServletResponse.SC_CREATED || respUpdApiVehicle.status == HttpServletResponse.SC_OK) {
-                                logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, respUpdateImages, Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
+                                logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [status:respUpdateImages.status], Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
                             }else{
-                                logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, respUpdateImages, Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
+                                logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [status:respUpdateImages.status], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
                             }
                             logwsService.createLog(logMap)
                         }catch(Exception e){
-                            response = "0 - Actualizamos el vehiculo, pero no las fotos"
+                            response = "200 - successfull: Actualizamos el vehiculo, pero no las fotos"
                             logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [:], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
                             logwsService.createLog(logMap)
                         }
 
                     }else{
-
                         try{
                             jsonVehicle = homologaService.homologaData(DataWsMap, userId, dealerId, accessToken)
                             def respApiVehicle = publicaService.createVehicle(jsonVehicle, accessToken)
 
                             if (respApiVehicle.data.id){
-                                response = "0 - "+respApiVehicle.data.id
+                                response = "200 - successfull: stock_number - " + (respApiVehicle.data.stock_number ? respApiVehicle.data.stock_number : "") + ", ws_id - " + (respApiVehicle.data.id ? respApiVehicle.data.id : "")
                                 logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, [status:respApiVehicle.status], Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_INSERT, userId, dealerId, respApiVehicle.data.id, '')
                                 logwsService.createLog(logMap)
 
                                 def respImagesProcess = publicaService.postImages(DataWsMap, accessToken, respApiVehicle.data.id, respApiVehicle.data)
                                 if(respImagesProcess.status == HttpServletResponse.SC_OK || respImagesProcess.status == HttpServletResponse.SC_CREATED ){
-                                    logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, respImagesProcess, Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_INSERT, userId, dealerId, respApiVehicle.data.id, '')
+                                    logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, [status:respImagesProcess.status], Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_INSERT, userId, dealerId, respApiVehicle.data.id, '')
                                 }else{
-                                    logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, respImagesProcess, Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_INSERT, userId, dealerId, respApiVehicle.data.id, '')
+                                    logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, [status:respImagesProcess.status], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_INSERT, userId, dealerId, respApiVehicle.data.id, '')
                                 }
                                 logwsService.createLog(logMap)
                             }else{
-                                response = "8 - "+respApiVehicle.data.message
-                                logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin, response, respApiVehicle, Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_INSERT, userId, dealerId, '', '')
+                                //Se busca en el cataogo las marcas posibles para el modelo dado por FORD
+                                def referenceModel = homologaService.processCatalog("MAR", DataWsMap.MarkMPId)
+                                def referenceModels = homologaService.getModelCatalog(referenceModel, result.data.access_token)
+                                def arrayModelos = '"'+'modeloID'+'":"'+'modelo",'
+                                referenceModels.data.children_categories.each{
+                                    arrayModelos += ('"' + it.categoryId.replace('MOD', '') + '":"'+ it.name +'",')
+                                }
+                                //Esta linea posiblemente retorne el estatus del catalogo
+                                response = "404 - " + respApiVehicle.data.message + (referenceModels.data.status ? "" : (", Intentar alguno de los siguientes IDs: " + arrayModelos))
+                                logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin, response, [status:respApiVehicle.status], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_INSERT, userId, dealerId, '', '')
                                 logwsService.createLog(logMap)
                             }
                         }catch(Exception e){
-                            response = "-1 - No se pudo hacer el update con vehicle sin fotos error:"+e.message.toString()
+                            response = "400 - bad_request: No se pudo hacer el update con vehicle sin fotos error: "+e.message.toString()
                             logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [:], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_UPDATE, userId, dealerId, '', '')
                             logwsService.createLog(logMap)
                         }
@@ -323,14 +328,14 @@ class CarsService {
 
                 }else{
 
-                    response = "8 - El usuario no tiene un dealer asociado"
+                    response = "400 - bad_request: El usuario no tiene un dealer asociado"
                     logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, resultDealer, Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_BEGIN, '', '', '', '')
                     logwsService.createLog(logMap)
                 }
 
             } else {
 
-                response = "1 - El usuario y/o contraseña no son validos"
+                response = "400 - bad_request: El usuario y/o contraseña no son validos"
                 logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, result, Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_BEGIN, '', '', '', '')
                 logwsService.createLog(logMap)
             }
@@ -375,19 +380,19 @@ class CarsService {
         }
 
         if(!dataMap.usuario){
-            response = "8 - El Usuario es requerido"
+            response = "400 - bad_request: El Usuario es requerido"
             logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin, response, [:], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_DELETE, '', '', '', '')
             logwsService.createLog(logMap)
             return response
         }
         if(!dataMap.pass){
-            response = "8 - La contraseña es requerida"
+            response = "400 - bad_request: La contraseña es requerida"
             logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin, response, [:], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_DELETE, '', '', '', '')
             logwsService.createLog(logMap)
             return response
         }
         if(!dataMap.stockNumber){
-            response = "8 - El NumeroInventarioCliente es requerido"
+            response = "400 - bad_request: El NumeroInventarioCliente es requerido"
             logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin, response, [:], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_DELETE, '', '', '', '')
             logwsService.createLog(logMap)
             return response
@@ -411,28 +416,28 @@ class CarsService {
                     def resultDeleted = publicaService.deleteVehicle(vehicleId, accessToken)
 
                     if(resultDeleted.data.message){
-                        response = "0 - El vehiculo con numero de inventario "+ dataMap.stockNumber+ "fue borrado"
+                        response = "404 - not_found: El vehiculo con numero de inventario " + dataMap.stockNumber+ " fue borrado"
                         logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin, response, resultDeleted, Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_DELETE, userId, dealerId, vehicleId, '')
                         logwsService.createLog(logMap)
                     }else{
-                        response = "0 - Ocurrio un problema con el borrado"
+                        response = "400 - bad_request: Ocurrio un problema al borrar el vehiculo con stock_number: " + dataMap.stockNumber
                         logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin, response, resultDeleted, Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_DELETE, userId, dealerId, vehicleId, '')
                         logwsService.createLog(logMap)
                     }
                 }else{
-                   response = "2 - El vehiculo con numero de  inventario ya fue borrado o no fue encontrado"
+                   response = "404 - not_found: El vehiculo con numero de inventario ${dataMap.stockNumber} ya fue borrado o no fue encontrado"
                    logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin, response, [:], Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_DELETE, userId, dealerId, vehicleId, '')
                    logwsService.createLog(logMap)
                 }
 
             }else{
-                response = "8 - El usuario no tiene un dealer asociado"
+                response = "400 - bad_request: El usuario ${dataMap.usuario} no tiene un dealer asociado"
                 logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin, response, resultDealer, Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_DELETE, userId, '', '', '')
                 logwsService.createLog(logMap)
             }
 
         }else {
-            response = "1 - El usuario y/o contraseña no son validos"
+            response = "400 - bad_request: El usuario y/o contraseña no son validos"
             logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin, response, [:], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_DELETE, '', '', '', '')
             logwsService.createLog(logMap)
         }

@@ -4,8 +4,12 @@ import grails.transaction.Transactional
 import maxipublica.Logws
 import com.wstoapi.exceptions.BadRequestException
 
-import org.joda.time.format.ISODateTimeFormat
+import org.joda.time.LocalTime
 import org.joda.time.format.DateTimeFormatter
+import org.joda.time.format.ISODateTimeFormat
+import groovy.time.TimeCategory
+import java.util.Calendar
+import java.util.Date
 
 @Transactional
 class LogwsService {
@@ -68,7 +72,6 @@ class LogwsService {
 
 
     def getLogs(def params){
-
         Map jsonResult = [:]
         def queryMap = [:]
 
@@ -180,7 +183,7 @@ class LogwsService {
                 if(params.date_from){
                     try{
                         date_from = ISODateTimeFormat.dateTimeParser().parseDateTime(params.date_from).toDate()
-                        ge("dateRegistered", date_from)
+                        ge("dateRegistered", fechaMasTiempo(date_from))
 
                     }catch(Exception e){
                         throw new BadRequestException("Wrong date format in date_from. Must be ISO json format")
@@ -190,7 +193,7 @@ class LogwsService {
                 if(params.date_to){
                     try{
                         date_to = ISODateTimeFormat.dateTimeParser().parseDateTime(params.date_to).toDate()
-                        le("dateRegistered", date_to)
+                        le("dateRegistered", fechaMasTiempo(date_to))
                     }catch(Exception e){
                         throw new BadRequestException("Wrong date format in date_to. Must be ISO json format")
                     }
@@ -205,13 +208,11 @@ class LogwsService {
                 }
             }
         }
-
         logsResults.each{
-
             logResults.add(
                     id:it.id,
                     action:it.action,
-                    date:it.dateRegistered,
+                    date:fechaMenosTiempo(it.dateRegistered),
                     origin:it.origin,
                     response:it.response,
                     tech:it.tech
@@ -227,5 +228,23 @@ class LogwsService {
 
         jsonResult
 
+    }
+    //Cuando se agrege la hora correcta al tomcat quitar este metodo y su llamada en la linea 215
+    private def fechaMenosTiempo(def value){
+        def ultimaF
+        use(TimeCategory){
+            ultimaF = value-5.hour
+            //ultimaF = ultimaF.format("yyyy-MM-dd")+"T"+"00:00:00.000"
+        }
+        return ultimaF
+    }
+    //Cuando se agrege la hora correcta al tomcat quitar este metodo y su llamada en las lineas 186 y 196
+    private def fechaMasTiempo(def value){
+        def ultimaF
+        use(TimeCategory){
+            ultimaF = value+5.hour
+            //ultimaF = ultimaF.format("yyyy-MM-dd")+"T"+"00:00:00.000"
+        }
+        return ultimaF
     }
 }

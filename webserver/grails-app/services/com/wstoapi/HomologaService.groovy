@@ -229,85 +229,105 @@ class HomologaService {
 
 
         if(!dataMap.User){
-            response.status = "1"
+            response.status = "400"
             response.message = "El Usuario es requerido"
+            response.error = "bad_request"
         }
         if(!dataMap.Pass){
-            response.status = "1"
+            response.status = "400"
             response.message = "La Contraseña es requerida"
+            response.error = "bad_request"
         }
 
         if(!dataMap.StockNumber){
-            response.status = "8"
+            response.status = "400"
             response.message = "El NumInventarioEmpresa es requerido"
+            response.error = "bad_request"
         }
         if(!dataMap.Price){
-            response.status = "8"
+            response.status = "400"
             response.message = "El Precio es requerido"
+            response.error = "bad_request"
         }
         if(!dataMap.TypeCurrency){
-            response.status = "8"
+            response.status = "400"
             response.message = "El TipoMoneda es requerido"
+            response.error = "bad_request"
         }
         if(!dataMap.Kilometers){
-            response.status = "8"
+            response.status = "400"
             response.message = "El Kilometraje es requerido"
+            response.error = "bad_request"
         }
         if(!dataMap.ExteriorColor){
-            response.status = "8"
+            response.status = "400"
             response.message = "El ColorExterior es requerido"
+            response.error = "bad_request"
         }
         if(!dataMap.InteriorColor){
-            response.status = "8"
+            response.status = "400"
             response.message = "El ColorExterior es requerido"
+            response.error = "bad_request"
         }
         if(!dataMap.Mark){
-            response.status = "8"
+            response.status = "400"
             response.message = "La Marca es requerida"
+            response.error = "bad_request"
         }
         if(!dataMap.MarkMPId){
-            response.status = "8"
+            response.status = "400"
             response.message = "La MarcaIDAutoplaza es requerida"
+            response.error = "bad_request"
         }
         if(!dataMap.Model){
-            response.status = "8"
+            response.status = "400"
             response.message = "El Modelo es requerido"
+            response.error = "bad_request"
         }
         if(!dataMap.ModelMPId){
-            response.status = "8"
+            response.status = "400"
             response.message = "El ModeloIDAutoplaza es requerido"
+            response.error = "bad_request"
         }
         if(!dataMap.Version){
-            response.status = "8"
+            response.status = "400"
             response.message = "El Submodelo es requerdio"
+            response.error = "bad_request"
         }
         if(!dataMap.VersionMPId){
-            response.status = "8"
+            response.status = "400"
             response.message = "El SubmodeloIDAutoplaza es requerido"
+            response.error = "bad_request"
         }
         if(!dataMap.Year){
-            response.status = "8"
+            response.status = "400"
             response.message = "El Anno es requerido"
+            response.error = "bad_request"
         }
         if(!dataMap.TypeVehicleMPId){
-            response.status = "8"
+            response.status = "400"
             response.message = "El TipoVehicleIDAutoplaza es requerido"
+            response.error = "bad_request"
         }
         if(!dataMap.TypeVestureMPId){
-            response.status = "8"
+            response.status = "400"
             response.message = "El TipoVestiduraIDAutoplaza es requerido"
+            response.error = "bad_request"
         }
         if(!dataMap.TypeTransmissionMPId){
-            response.status = "8"
+            response.status = "400"
             response.message = "El TipoTransmisionIDAutoplaza es requerido"
+            response.error = "bad_request"
         }
         if(!dataMap.StatusVehicleMPId){
-            response.status = "8"
+            response.status = "400"
             response.message = "El StatusVehiculoIDAutoplaza es requerido"
+            response.error = "bad_request"
         }
         if(!dataMap.Action){
-            response.status = "8"
+            response.status = "400"
             response.message = "El EventoArealizar es requerido"
+            response.error = "bad_request"
         }
 
 
@@ -406,6 +426,17 @@ class HomologaService {
 
 
         def result = restService.getResource("/catalog/MX/MLM/${categoryId}/", queryParams)
+
+        result
+    }
+
+    def getModelCatalog(def categoryId, def accessToken){
+
+        def queryParams = [
+                access_token:accessToken
+        ]
+
+        def result = restService.getResource("/catalog/MX/MXP/${categoryId}/", queryParams)
 
         result
     }

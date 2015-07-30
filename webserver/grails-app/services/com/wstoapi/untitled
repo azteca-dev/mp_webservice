@@ -1,0 +1,63 @@
+println "usuario: " + usuario
+println "pass: " + contrasenna
+println "stockNumber: " + NumInventarioEmpresa
+println "description: " + DescripconAuto
+println "precio: " + Precio
+println "top moneda: " + TipoMoneda
+println "tipo precio apc: " + Tipo_PrecioIDAutoplaza
+println "kilometraje: " + Kilometraje
+println "tipo de kilometraje apc: " + Tipo_KilometrajeIDAutoplaza
+println "ColorExterior: " + ColorExterior
+println "ColorInterior: " + ColorInterior
+println "marca: " + Marca
+println "marca apc: " + MarcaIDAutoplaza
+println "modelo: " + Modelo
+println "modelo apc: " + ModeloIDAutoplaza
+println "Submodelo: " + Submodelo
+println "SubmodeloIDInterno: " + SubmodeloIDInterno
+println "SubmodeloIDAutoplaza: " + SubmodeloIDAutoplaza
+println "año: " + Anno
+println "TipoVehiculoIDAutoplaza: " + TipoVehiculoIDAutoplaza
+println "TipoVestiduraIDAutoplaza: " + TipoVestiduraIDAutoplaza
+println "TipoTransmisionIDAutoplaza: " + TipoTransmisionIDAutoplaza
+println "StatusVehiculoIDAutoplaza: " + StatusVehiculoIDAutoplaza
+println "EmpresaIDAutoplaza: " + EmpresaIDAutoplaza
+println "EmpresaIDinterno: " + EmpresaIDinterno
+println "AutoBlindado: " + AutoBlindado
+println "AutoAccidentadoRecuperado: " + AutoAccidentadoRecuperado
+println "NumSerieAuto: " + NumSerieAuto
+println "Equipamiento: " + Equipamiento
+println "foto: " + UrlFoto1
+println "foto: " + UrlFoto2
+println "foto: " + UrlFoto3
+println "foto: " + UrlFoto4
+println "foto: " + UrlFoto5
+println "foto: " + UrlFoto6
+println "foto: " + UrlFoto7
+println "foto: " + UrlFoto8
+println "foto: " + UrlFoto9
+println "foto: " + UrlFoto10
+println "foto: " + UrlFoto11
+println "foto: " + UrlFoto12
+println "foto: " + UrlFoto13
+println "foto: " + UrlFoto14
+println "foto: " + UrlFoto15
+println "foto: " + UrlFoto16
+println "foto: " + UrlFoto17
+println "foto: " + UrlFoto18
+println "foto: " + UrlFoto19
+println "foto: " + UrlFoto20
+println "foto: " + UrlFoto21
+println "foto: " + UrlFoto22
+println "foto: " + UrlFoto23
+println "foto: " + UrlFoto24
+println "foto: " + UrlFoto25
+println "foto: " + UrlFoto26
+println "foto: " + UrlFoto27
+println "foto: " + UrlFoto28
+println "foto: " + UrlFoto29
+println "foto: " + UrlFoto30
+println "foto: " + UrlFoto31
+println "foto: " + UrlFoto32
+println "evento a realizar: " + EventoArealizar
+println ":-------------------------------D"

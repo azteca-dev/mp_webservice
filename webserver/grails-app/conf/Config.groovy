@@ -88,12 +88,13 @@ grails.hibernate.osiv.readonly = false
 environments {
     development {
         grails.logging.jul.usebridge = true
-
-        domainMain = 'http://api2.maxipublica.com:9091'
+        domainMain = 'http://api.maxipublica.com'
+        //domainMain = 'http://pre.maxipublica.com'
     }
     production {
         grails.logging.jul.usebridge = false
-        domainMain = 'http://api2.maxipublica.com:9091'
+        domainMain = 'http://api.maxipublica.com'
+        //domainMain = 'http://pre.maxipublica.com'
         // TODO: grails.serverURL = "http://www.changeme.com"
     }
 }

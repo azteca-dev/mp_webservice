@@ -30,10 +30,10 @@ class RestService {
 
     def urlBase        =  grailsApplication.config.domainMain
 
-    def restClient  = new RESTClient(urlBase)
+    
 
     def getResource(def resource, def queryParams){
-
+        def restClient  = new RESTClient(urlBase)
         Map result = [:]
 
 
@@ -53,13 +53,14 @@ class RestService {
             result.status   = e.response.responseData.status
             result.data     = dataMap
         }
-
+        restClient = null
         result
 
 
     }
 
     def getResource(def resource){
+        def restClient  = new RESTClient(urlBase)
 
         Map result = [:]
 
@@ -81,7 +82,7 @@ class RestService {
             result.data     = dataMap
         }
 
-
+        restClient = null
         result
 
 
@@ -89,6 +90,7 @@ class RestService {
 
 
     def postResource(def resource, def body){
+        def restClient  = new RESTClient(urlBase)
 
         Map result = [:]
 
@@ -114,11 +116,12 @@ class RestService {
             result.status   = e.response.responseData.status
             result.data     = dataMap
         }
-
+        restClient = null
         result
     }
 
     def postResource(def resource,def query, def body){
+        def restClient  = new RESTClient(urlBase)
 
         Map result = [:]
 
@@ -144,11 +147,12 @@ class RestService {
             result.status   = e.response.responseData.status
             result.data     = dataMap
         }
-
+        restClient = null
         result
     }
 
     def putResource(def resource, def body){
+        def restClient  = new RESTClient(urlBase)
         Map result = [:]
 
 
@@ -174,11 +178,12 @@ class RestService {
             result.status   = e.response.responseData.status
             result.data     = dataMap
         }
-
+        restClient = null
         result
     }
 
     def putResource(def resource,def query, def body){
+        def restClient  = new RESTClient(urlBase)
         Map result = [:]
         try {
 
@@ -202,11 +207,12 @@ class RestService {
             result.status   = e.response.responseData.status
             result.data     = dataMap
         }
-
+        restClient = null
         result
     }
 
     def deleteResource(def resource, def query, def body){
+        def restClient  = new RESTClient(urlBase)
 
         Map result = [:]
         try {
@@ -234,11 +240,13 @@ class RestService {
         }catch(Exception e){
             println "!! :( Entonces cual es al exception"+e
         }
+        restClient = null
         result
 
     }
 
     def deleteResource(def resource, def query){
+        def restClient  = new RESTClient(urlBase)
 
         Map result = [:]
         try {
@@ -261,6 +269,7 @@ class RestService {
             result.data     = dataMap
 
         }
+        restClient = null
         result
 
     }

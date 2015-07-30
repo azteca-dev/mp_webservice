@@ -85,8 +85,8 @@ class CarsService {
 
     ) {
 
-
-
+        def DataWsMap = [:]
+        def dataLogMapOrigin = [:]
         def response = "0"
         def accessToken
         def jsonVehicle
@@ -95,7 +95,7 @@ class CarsService {
         def dealerId
         def logMap
 
-        def dataLogMapOrigin =[
+        dataLogMapOrigin =[
 
                 usuario                     : usuario,
                 contrasenna                 : contrasenna,
@@ -161,7 +161,7 @@ class CarsService {
                 EventoArealizar             : EventoArealizar
         ]
 
-        def DataWsMap = [
+        DataWsMap = [
 
                 User                    : usuario,
                 Pass                    : contrasenna,
@@ -258,35 +258,57 @@ class CarsService {
                     dealerId = resultDealer.data.dealer_id
                     def vehicleId = publicaService.searchVehicle(DataWsMap.StockNumber, dealerId, accessToken)
 
-
+                    //Esta parte del if es para verificar si se realiza una actualizacion o un POST nuevo
+                    //(vehicleId != 0) es una actualizacion
                     if(vehicleId != 0){
-
                             jsonVehicleUPD = homologaService.homologaDataUpdate(DataWsMap, userId, dealerId, accessToken)
                             def respUpdApiVehicle = publicaService.updateVehicle(vehicleId, jsonVehicleUPD, accessToken)
-
-                            if(respUpdApiVehicle.status == HttpServletResponse.SC_OK || respUpdApiVehicle.status == HttpServletResponse.SC_CREATED ) {
-                                response = "200 - successfull: stock_number - " + (respUpdApiVehicle.data.stock_number ? respUpdApiVehicle.data.stock_number : "") + ", ws_id - " + (respUpdApiVehicle.data.id ? respUpdApiVehicle.data.id : "") + ". Actualizamos el vehiculo correctamente"
-                                logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [ status:respUpdApiVehicle.status], Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
-                                logwsService.createLog(logMap)
+                            try {
+                            if(respUpdApiVehicle.status == HttpServletResponse.SC_OK || respUpdApiVehicle.status == HttpServletResponse.SC_CREATED || respUpdApiVehicle.status == 200 || respUpdApiVehicle.status == 201) {
+                                if(EventoArealizar == "2"){
+                                    response = "200 - successfull: stock_number - " + (respUpdApiVehicle.data.stock_number ? respUpdApiVehicle.data.stock_number : "") + ", ws_id - " + (respUpdApiVehicle.data.id ? respUpdApiVehicle.data.id : "") + ". Actualizamos el vehiculo correctamente al republicar"
+                                    //logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, respUpdApiVehicle, Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_REPUBLISH, userId, dealerId, vehicleId, '')
+                                }else{
+                                    response = "200 - successfull: stock_number - " + (respUpdApiVehicle.data.stock_number ? respUpdApiVehicle.data.stock_number : "") + ", ws_id - " + (respUpdApiVehicle.data.id ? respUpdApiVehicle.data.id : "") + ". Actualizamos el vehiculo correctamente"
+                                    //logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, respUpdApiVehicle, Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
+                                }
+                                /*logwsService.createLog(logMap)*/
                             }else{
-                                response = "400 - bad_request: stock_number - " + (respUpdApiVehicle.data.stock_number ? respUpdApiVehicle.data.stock_number : "") + ", ws_id - " + (respUpdApiVehicle.data.id ? respUpdApiVehicle.data.id : "")  + ". No pudimos actualizar el vehiculo"
-                                logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [ status:respUpdApiVehicle.status], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
-                                logwsService.createLog(logMap)
+                                if(EventoArealizar == "2"){
+                                    response = "400 - bad_request: stock_number - " + (respUpdApiVehicle.data.stock_number ? respUpdApiVehicle.data.stock_number : "") + ", ws_id - " + (respUpdApiVehicle.data.id ? respUpdApiVehicle.data.id : "")  + ". No pudimos actualizar el vehiculo al republicar"
+                                    //logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [ status:respUpdApiVehicle.status, jsonEnvio:jsonVehicleUPD], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_REPUBLISH, userId, dealerId, vehicleId, '')
+                                }else{
+                                    response = "400 - bad_request: stock_number - " + (respUpdApiVehicle.data.stock_number ? respUpdApiVehicle.data.stock_number : "") + ", ws_id - " + (respUpdApiVehicle.data.id ? respUpdApiVehicle.data.id : "")  + ". No pudimos actualizar el vehiculo"
+                                    //logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [ status:respUpdApiVehicle.status, jsonEnvio:jsonVehicleUPD], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
+                                }
+                                /*logwsService.createLog(logMap)*/
                             }
-                        try {
+                        
                             def respUpdateImages = publicaService.updateImages(DataWsMap, accessToken, respUpdApiVehicle.data.id)
-                            if(respUpdApiVehicle == HttpServletResponse.SC_CREATED || respUpdApiVehicle.status == HttpServletResponse.SC_OK) {
-                                logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [status:respUpdateImages.status], Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
+                            
+                            if(respUpdateImages == HttpServletResponse.SC_CREATED || respUpdateImages.status == HttpServletResponse.SC_OK || respUpdateImages.status == 200 || respUpdateImages.status == 201) {
+                                if(EventoArealizar == "2"){
+                                    response += ". Actualizamos correctamente las imagenes al republicar"
+                                    logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [vehicle:respUpdApiVehicle, status:respUpdateImages], Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_REPUBLISH, userId, dealerId, vehicleId, '')
+                                }else{
+                                    response += ". Actualizamos correctamente las imagenes"
+                                    logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [vehicle:respUpdApiVehicle, status:respUpdateImages], Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
+                                }
                             }else{
-                                logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [status:respUpdateImages.status], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
+                                if(EventoArealizar == "2"){
+                                    response += ". No pudimos actualizar las imagenes al republicar"
+                                    logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [vehicle:respUpdApiVehicle, status:respUpdateImages], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_REPUBLISH, userId, dealerId, vehicleId, '')
+                                }else{
+                                    response += ". No pudimos actualizar las imagenes"
+                                    logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [vehicle:respUpdApiVehicle, status:respUpdateImages], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
+                                }
                             }
                             logwsService.createLog(logMap)
                         }catch(Exception e){
-                            response = "200 - successfull: Actualizamos el vehiculo, pero no las fotos"
+                            response = "400 - error: Algo malo ocurrio al actualizar el vehiculo"
                             logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [:], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
                             logwsService.createLog(logMap)
                         }
-
                     }else{
                         try{
                             jsonVehicle = homologaService.homologaData(DataWsMap, userId, dealerId, accessToken)
@@ -294,18 +316,20 @@ class CarsService {
 
                             if (respApiVehicle.data.id){
                                 response = "200 - successfull: stock_number - " + (respApiVehicle.data.stock_number ? respApiVehicle.data.stock_number : "") + ", ws_id - " + (respApiVehicle.data.id ? respApiVehicle.data.id : "")
-                                logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, [status:respApiVehicle.status], Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_INSERT, userId, dealerId, respApiVehicle.data.id, '')
-                                logwsService.createLog(logMap)
+                                //logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, [status:respApiVehicle], Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_INSERT, userId, dealerId, respApiVehicle.data.id, '')
+                                //logwsService.createLog(logMap)
 
                                 def respImagesProcess = publicaService.postImages(DataWsMap, accessToken, respApiVehicle.data.id, respApiVehicle.data)
-                                if(respImagesProcess.status == HttpServletResponse.SC_OK || respImagesProcess.status == HttpServletResponse.SC_CREATED ){
-                                    logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, [status:respImagesProcess.status], Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_INSERT, userId, dealerId, respApiVehicle.data.id, '')
+                                if(respImagesProcess.status == HttpServletResponse.SC_OK || respImagesProcess.status == HttpServletResponse.SC_CREATED || respImagesProcess.status == 200 || respImagesProcess.status == 201){
+                                    response += ". Se insertaron correctamente las imagenes al publicar"
+                                    logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, [vehicle:respApiVehicle, images:respImagesProcess], Constants.LOG_STATUS_SUCCESSFUL, Constants.LOG_ACTION_INSERT, userId, dealerId, respApiVehicle.data.id, '')
                                 }else{
-                                    logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, [status:respImagesProcess.status], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_INSERT, userId, dealerId, respApiVehicle.data.id, '')
+                                    response += ". No se pudo insertar correctamente las imagenes al publicar"
+                                    logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin,response, [vehicle:respApiVehicle, images:respImagesProcess], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_INSERT, userId, dealerId, respApiVehicle.data.id, '')
                                 }
                                 logwsService.createLog(logMap)
                             }else{
-                                //Se busca en el cataogo las marcas posibles para el modelo dado por FORD
+                                //Se busca en el catalogo las marcas posibles para el modelo dado por FORD
                                 def referenceModel = homologaService.processCatalog("MAR", DataWsMap.MarkMPId)
                                 def referenceModels = homologaService.getModelCatalog(referenceModel, result.data.access_token)
                                 def arrayModelos = '"'+'modeloID'+'":"'+'modelo",'
@@ -314,11 +338,11 @@ class CarsService {
                                 }
                                 //Esta linea posiblemente retorne el estatus del catalogo
                                 response = "404 - " + respApiVehicle.data.message + (referenceModels.data.status ? "" : (", Intentar alguno de los siguientes IDs: " + arrayModelos))
-                                logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin, response, [status:respApiVehicle.status], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_INSERT, userId, dealerId, '', '')
+                                logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin, response, [status:respApiVehicle.status, jsonEnvio:jsonVehicle], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_INSERT, userId, dealerId, '', '')
                                 logwsService.createLog(logMap)
                             }
                         }catch(Exception e){
-                            response = "400 - bad_request: No se pudo hacer el update con vehicle sin fotos error: "+e.message.toString()
+                            response = "400 - bad_request: "+e.message.toString()
                             logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [:], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_UPDATE, userId, dealerId, '', '')
                             logwsService.createLog(logMap)
                         }
@@ -341,23 +365,87 @@ class CarsService {
             }
 
         }
-
         return  response
 
-    }
+
+/*println "usuario: " + usuario
+println "pass: " + contrasenna
+println "stockNumber: " + NumInventarioEmpresa
+println "description: " + DescripconAuto
+println "precio: " + Precio
+println "top moneda: " + TipoMoneda
+println "tipo precio apc: " + Tipo_PrecioIDAutoplaza
+println "kilometraje: " + Kilometraje
+println "tipo de kilometraje apc: " + Tipo_KilometrajeIDAutoplaza
+println "ColorExterior: " + ColorExterior
+println "ColorInterior: " + ColorInterior
+println "marca: " + Marca
+println "marca apc: " + MarcaIDAutoplaza
+println "modelo: " + Modelo
+println "modelo apc: " + ModeloIDAutoplaza
+println "Submodelo: " + Submodelo
+println "SubmodeloIDInterno: " + SubmodeloIDInterno
+println "SubmodeloIDAutoplaza: " + SubmodeloIDAutoplaza
+println "año: " + Anno
+println "TipoVehiculoIDAutoplaza: " + TipoVehiculoIDAutoplaza
+println "TipoVestiduraIDAutoplaza: " + TipoVestiduraIDAutoplaza
+println "TipoTransmisionIDAutoplaza: " + TipoTransmisionIDAutoplaza
+println "StatusVehiculoIDAutoplaza: " + StatusVehiculoIDAutoplaza
+println "EmpresaIDAutoplaza: " + EmpresaIDAutoplaza
+println "EmpresaIDinterno: " + EmpresaIDinterno
+println "AutoBlindado: " + AutoBlindado
+println "AutoAccidentadoRecuperado: " + AutoAccidentadoRecuperado
+println "NumSerieAuto: " + NumSerieAuto
+println "Equipamiento: " + Equipamiento
+println "foto: " + UrlFoto1
+println "foto: " + UrlFoto2
+println "foto: " + UrlFoto3
+println "foto: " + UrlFoto4
+println "foto: " + UrlFoto5
+println "foto: " + UrlFoto6
+println "foto: " + UrlFoto7
+println "foto: " + UrlFoto8
+println "foto: " + UrlFoto9
+println "foto: " + UrlFoto10
+println "foto: " + UrlFoto11
+println "foto: " + UrlFoto12
+println "foto: " + UrlFoto13
+println "foto: " + UrlFoto14
+println "foto: " + UrlFoto15
+println "foto: " + UrlFoto16
+println "foto: " + UrlFoto17
+println "foto: " + UrlFoto18
+println "foto: " + UrlFoto19
+println "foto: " + UrlFoto20
+println "foto: " + UrlFoto21
+println "foto: " + UrlFoto22
+println "foto: " + UrlFoto23
+println "foto: " + UrlFoto24
+println "foto: " + UrlFoto25
+println "foto: " + UrlFoto26
+println "foto: " + UrlFoto27
+println "foto: " + UrlFoto28
+println "foto: " + UrlFoto29
+println "foto: " + UrlFoto30
+println "foto: " + UrlFoto31
+println "foto: " + UrlFoto32
+println "evento a realizar: " + EventoArealizar
+println ":-------------------------------D"*/
+}
 
 
     def Borrar_Anuncio(String usuario, String contraseña, String empresaID_, String NumInventarioCliente){
-
-
-        def dataLogMapOrigin =[
+        def DataWsMap = [:]
+        def dataLogMapOrigin = [:]
+        
+        dataLogMapOrigin =[
                 usuario:usuario,
                 contraseña:contraseña,
                 empresaID_:empresaID_,
                 NumInventarioCliente:NumInventarioCliente
         ]
 
-        def dataMap = [
+        dataMap = [
                 usuario:usuario,
                 pass:contraseña,
                 dealerId:empresaID_,
@@ -441,7 +529,6 @@ class CarsService {
             logMap = logwsService.createMapLog(remoteAddress,dataLogMapOrigin, response, [:], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_DELETE, '', '', '', '')
             logwsService.createLog(logMap)
         }
-
         return response
     }
 }

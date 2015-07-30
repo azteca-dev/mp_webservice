@@ -202,7 +202,7 @@ class LogwsService {
                 if(params.date_from && params.date_to){
 
                     if(date_to < date_from){
-                        throw new BadRequestException("Invalid date range, date date_to must be greater then date date_from")
+                        throw new BadRequestException("Invalid date range, date date_to must be greater than date date_from")
                     }
 
                 }

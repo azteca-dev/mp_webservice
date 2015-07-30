@@ -7,10 +7,56 @@ import rest.RestService
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
+import org.joda.time.LocalTime
+import groovy.time.TimeCategory
+import org.joda.time.format.DateTimeFormatter
+import org.joda.time.format.ISODateTimeFormat
+import java.util.Calendar
+import java.util.Date
+
 @Transactional
 class HomologaService {
 
     def restService = new RestService()
+    def marcaGeneral = ""
+    def modeloGeneral = ""
+    def annioGeneral = ""
+    def versionGeneral = ""
+
+    private void setMarcaGeneral(String marcaGeneral){
+        this.marcaGeneral = marcaGeneral
+    }
+    private String getMarcaGeneral(){
+        return this.marcaGeneral
+    }
+
+
+    private void setModeloGeneral(String modeloGeneral){
+        this.modeloGeneral = modeloGeneral
+    }
+    private String getModeloGeneral(){
+        return this.modeloGeneral
+    }
+
+
+    private void setAnnioGeneral(String annioGeneral){
+        this.annioGeneral = annioGeneral
+    }
+    private String getAnnioGeneral(){
+        return this.annioGeneral
+    }
+
+
+    private void setVersionGeneral(String versionGeneral){
+        this.versionGeneral = versionGeneral
+    }
+    private String getVersionGeneral(){
+        return this.versionGeneral
+    }
+
+
+
+
 
     def homologaData(def dataMap, def userId, def dealerId, def accessToken) {
 
@@ -107,12 +153,12 @@ class HomologaService {
         jsonVehicleForPut
     }
 
-    def createJsonImages (def listImages){
+    def createJsonImages (def listImages, def stockNumber){
 
         def images = []
 
         listImages.each{
-            if(it){
+            if(it && it.contains("AutoID="+stockNumber)){
                 images.add("url":it)
             }
         }
@@ -340,8 +386,20 @@ class HomologaService {
         dataMap.ModelMPId   = processCatalog("MOD", dataMap.ModelMPId)
         dataMap.VersionMPId = processCatalog("VER", dataMap.VersionMPId)
 
-        if(!existsVersionCatalog(dataMap.VersionMPId, accessToken)){
-            dataMap.VersionMPId = getVersionNotCatalog(dataMap.ModelMPId, dataMap.Year,accessToken )
+        //Valida si no existe la version del catalogo que ellos estan mandando
+        if(!existCatalog(dataMap.VersionMPId, accessToken)){
+            //ahora validamos que exista el modelo que ellos estan mandanto            
+            //dataMap.VersionMPId = getVersionNotCatalog(dataMap.ModelMPId, dataMap.Year,accessToken )
+
+            //ahora validamos que exista el modelo que ellos estan mandando            
+            if(existCatalog(dataMap.ModelMPId, accessToken)){
+                dataMap.ModelMPId = getVersionNotCatalog(dataMap.ModelMPId, accessToken )
+                dataMap.VersionMPId = getVersionGeneral()
+            }else if(existCatalog(dataMap.MarkMPId, accessToken)){
+                dataMap.MarkMPId = getModeloNotCatalog(dataMap.MarkMPId, accessToken)
+                dataMap.ModelMPId = getModeloGeneral()
+                dataMap.VersionMPId = getVersionGeneral()
+            }
         }
 
 
@@ -372,7 +430,7 @@ class HomologaService {
     }
 
 
-    def existsVersionCatalog (def versionId, def accessToken){
+    def existCatalog (def versionId, def accessToken){
 
         def getResutlVersion = getCategoryCatalog(versionId, accessToken)
 
@@ -383,6 +441,7 @@ class HomologaService {
         }
     }
 
+    //debe de Buscar Otra Version
     def getVersionNotCatalog(def modeloId, def valueYear, def accessToken){
 
 
@@ -391,33 +450,134 @@ class HomologaService {
         if(yearId != "0"){
             def versiones = getCategoryCatalog(yearId, accessToken)
             if(versiones.status == HttpServletResponse.SC_OK){
-                versionId = versiones.data.children_categories[0].category_id
+                versionId = versiones.data.children_categories.each{
+                    if (it.category_id.substring(0, 7).equals("VEROTRO")) {
+                        versionId = it.category_id
+                    }
+                }
             }
         }
 
         versionId
 
     }
-
+    //Retorna el año que se esta buscando si no debe de retornar Otro Años length()
     def getYearIdFromModeloAndYear(def modeloId, def valueYear, def accessToken){
 
 
         def yearId = "0"
+        def yearOtro = "0"
+        def control = false
         def result = getCategoryCatalog(modeloId, accessToken)
 
         if (result.status == HttpServletResponse.SC_OK){
             result.data.children_categories.each{
-                 if(it.name == valueYear){
-                     yearId = it.category_id
-                 }
+                if(it.name == valueYear){
+                    yearId = it.category_id
+                }
+                if (it.category_id.substring(0, 7).equals("YEROTRO")) {
+                    yearOtro = it.category_id
+                }
             }
+        }
+
+        if ((yearId == "0") && (yearOtro != "0")) {
+            yearId = yearOtro
         }
 
         yearId
 
     }
 
+    //Asigna ModeloGeneral, AnnioGeneral y VersionGeneral
+    def getVersionNotCatalog(def modeloId, def accessToken){
+        def marOtro = "-1"
+        def modOtro = "-1"
+        def yerOtro = "-1"
+        def verOtro = "-1"
+        def result = getCategoryCatalog(modeloId, accessToken)
 
+        setModeloGeneral(modOtro)
+        setAnnioGeneral(yerOtro)
+        setVersionGeneral(verOtro)
+
+        if(result.data.children_categories){
+            result.data.children_categories.each{
+                if((it.category_id.length() >= 7) && (it.category_id.substring(0, 7).equals("YEROTRO"))) {
+                    yerOtro = it.category_id
+                }
+            }
+        }
+
+        result = getCategoryCatalog(yerOtro, accessToken)
+        if(result.data.children_categories){
+            result.data.children_categories.each{
+                if((it.category_id.length() >= 7) && (it.category_id.substring(0, 7).equals("VEROTRO"))) {
+                    verOtro = it.category_id
+                }
+            }
+        }
+
+        setModeloGeneral(modeloId)
+        setAnnioGeneral(yerOtro)
+        setVersionGeneral(verOtro)
+
+        modeloId
+
+    }
+
+    //Deve de buscar Otra Marca
+    //Verificar que es lo que retorna para saber si retornar la version o la marca que recive puesto que puede que exista o no
+    //Asigna MarcaGeneral, ModeloGeneral, AnnioGeneral y VersionGeneral
+    private def getModeloNotCatalog(def marcaId, def accessToken){
+        def marOtro = "-1"
+        def modOtro = "-1"
+        def yerOtro = "-1"
+        def verOtro = "-1"
+        def result = getCategoryCatalog(marcaId, accessToken)
+
+        setMarcaGeneral(marOtro)
+        setModeloGeneral(modOtro)
+        setAnnioGeneral(yerOtro)
+        setVersionGeneral(verOtro)
+        
+        if(result.data.children_categories) {
+            result.data.children_categories.each{
+                if((it.category_id.length() >= 7) && (it.category_id.substring(0, 7).equals("MODOTRO"))) {
+                    modOtro = it.category_id
+                }
+            }
+        }
+
+        result = getCategoryCatalog(modOtro, accessToken)
+        if(result.data.children_categories){
+            result.data.children_categories.each{
+                if((it.category_id.length() >= 7) && (it.category_id.substring(0, 7).equals("YEROTRO"))) {
+                    yerOtro = it.category_id
+                }
+            }
+        }
+
+        result = getCategoryCatalog(yerOtro, accessToken)
+        if(result.data.children_categories){
+            result.data.children_categories.each{
+                if((it.category_id.length() >= 7) && (it.category_id.substring(0, 7).equals("VEROTRO"))) {
+                    verOtro = it.category_id
+                }
+            }
+        }
+
+        setMarcaGeneral(marcaId)
+        setModeloGeneral(modOtro)
+        setAnnioGeneral(yerOtro)
+        setVersionGeneral(verOtro)
+
+        marcaId
+
+        //marcaId
+    }
+
+    //Recupera una categoria en especifico
     def getCategoryCatalog(def categoryId, def accessToken){
 
         def queryParams = [
@@ -456,5 +616,24 @@ class HomologaService {
        }else{
           return null
        }
+    }
+
+    //Cuando se agrege la hora correcta al tomcat quitar este metodo y su llamada en la linea 215
+    def fechaMenosTiempo(def value){
+        def ultimaF
+        def fechaISO = ISODateTimeFormat.dateTimeParser().parseDateTime(value).toDate()
+        use(TimeCategory){
+            ultimaF = fechaISO-5.hour
+        }
+        return ultimaF
+    }
+    //Cuando se agrege la hora correcta al tomcat quitar este metodo y su llamada en las lineas 186 y 196
+    def fechaMasTiempo(def value){
+        def ultimaF
+        def fechaISO = ISODateTimeFormat.dateTimeParser().parseDateTime(value).toDate()
+        use(TimeCategory){
+            ultimaF = fechaISO+5.hour
+        }
+        return ultimaF
     }
 }

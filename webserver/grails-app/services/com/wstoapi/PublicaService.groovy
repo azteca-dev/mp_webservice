@@ -44,34 +44,66 @@ class PublicaService {
         if(dataMap.Pic7){listaImages.add(dataMap.Pic7)}
         if(dataMap.Pic8){listaImages.add(dataMap.Pic8)}
         if(dataMap.Pic9){listaImages.add(dataMap.Pic9)}
-        if(dataMap.Pic10){listaImages.add( dataMap.Pic10)}
+        if(dataMap.Pic10){listaImages.add(dataMap.Pic10)}
         if(dataMap.Pic11){listaImages.add(dataMap.Pic11)}
         if(dataMap.Pic12){listaImages.add(dataMap.Pic12)}
         if(dataMap.Pic13){listaImages.add(dataMap.Pic13)}
         if(dataMap.Pic14){listaImages.add(dataMap.Pic14)}
         if(dataMap.Pic15){listaImages.add(dataMap.Pic15)}
+        if(dataMap.Pic16){listaImages.add(dataMap.Pic16)}
+        if(dataMap.Pic17){listaImages.add(dataMap.Pic17)}
+        if(dataMap.Pic18){listaImages.add(dataMap.Pic18)}
+        if(dataMap.Pic19){listaImages.add(dataMap.Pic19)}
+        if(dataMap.Pic20){listaImages.add(dataMap.Pic20)}
+
+        println "Webservice PUT DataMap de datos: " + dataMap
+        //println "Webservice PUT Array de images: " + listaImages
 
         if(listaImages.size() > 0) {
-
             def imagesVehicle = restService.getResource("/images/${vehicleId}")
             if(imagesVehicle.data.images){
                    def resultDelImages = restService.deleteResource("/images/${vehicleId}/", queryParams)
-                   if(resultDelImages.status == HttpServletResponse.SC_OK){
-                       bodyImagen = homologaService.createJsonImages(listaImages)
-                       resultUpdateImage = restService.postResource("/images/${vehicleId}/", queryParams, bodyImagen)
+                   println "Webservice PUT DELETE map de images: " + resultDelImages
+                   if(resultDelImages.status == HttpServletResponse.SC_OK || resultDelImages.status == 201){
+                       bodyImagen = homologaService.createJsonImages(listaImages, dataMap.StockNumber)
+                        if (bodyImagen.images.size() > 0) {
+                            resultUpdateImage = restService.postResource("/images/${vehicleId}/", queryParams, bodyImagen)
+                            println "Webservice PUT POST map de images: " + resultUpdateImage
+                            resultUpdateImage.arrayImages = [:]
+                            resultUpdateImage.arrayImages = bodyImagen
+                        }else{
+                            resultUpdateImage = [
+                                status:HttpServletResponse.SC_NOT_FOUND,
+                                message: "Las fotos no corresponden al Vehiculo",
+                                error: "not_found"
+                            ]
+                        }
                    }
-
             }else{
-
-                bodyImagen = homologaService.createJsonImages(listaImages)
-                resultUpdateImage = restService.postResource("/images/${vehicleId}/", queryParams, bodyImagen)
+                bodyImagen = homologaService.createJsonImages(listaImages, dataMap.StockNumber)
+                if (bodyImagen.images.size() > 0) {
+                    resultUpdateImage = restService.postResource("/images/${vehicleId}/", queryParams, bodyImagen)
+                    println "Webservice PUT POST map de images: " + resultUpdateImage
+                    resultUpdateImage.arrayImages = [:]
+                    resultUpdateImage.arrayImages = bodyImagen
+                }else{
+                    resultUpdateImage = [
+                        status:HttpServletResponse.SC_NOT_FOUND,
+                        message: "Las fotos no corresponden al Vehiculo",
+                        error: "not_found"
+                    ]
+                }
             }
         }else{
-            resultPostImage = [
+            resultUpdateImage = restService.deleteResource("/images/${vehicleId}/", queryParams)
+            println "Webservice PUT POST map de images: " + resultUpdateImage
+            resultUpdateImage.arrayImages = [:]
+            resultUpdateImage.arrayImages = bodyImagen
+            /*resultUpdateImage = [
                     status:HttpServletResponse.SC_NOT_FOUND,
                     message: "No se enviaron fotos en la actualización",
                     error: "not_found"
-            ]
+            ]*/
         }
 
         resultUpdateImage
@@ -101,21 +133,47 @@ class PublicaService {
         if(dataMap.Pic7){listaImages.add(dataMap.Pic7)}
         if(dataMap.Pic8){listaImages.add(dataMap.Pic8)}
         if(dataMap.Pic9){listaImages.add(dataMap.Pic9)}
-        if(dataMap.Pic10){listaImages.add( dataMap.Pic10)}
+        if(dataMap.Pic10){listaImages.add(dataMap.Pic10)}
         if(dataMap.Pic11){listaImages.add(dataMap.Pic11)}
         if(dataMap.Pic12){listaImages.add(dataMap.Pic12)}
         if(dataMap.Pic13){listaImages.add(dataMap.Pic13)}
         if(dataMap.Pic14){listaImages.add(dataMap.Pic14)}
         if(dataMap.Pic15){listaImages.add(dataMap.Pic15)}
+        if(dataMap.Pic16){listaImages.add(dataMap.Pic16)}
+        if(dataMap.Pic17){listaImages.add(dataMap.Pic17)}
+        if(dataMap.Pic18){listaImages.add(dataMap.Pic18)}
+        if(dataMap.Pic19){listaImages.add(dataMap.Pic19)}
+        if(dataMap.Pic20){listaImages.add(dataMap.Pic20)}
 
+        println "Webservice POST DataMap de datos: " + dataMap
+        //println "Webservice POST Array de images: " + listaImages
 
         if(listaImages.size() > 0) {
-            bodyImagen = homologaService.createJsonImages(listaImages)
-            resultPostImage = restService.postResource("/images/${vehicleId}/", queryParams, bodyImagen)
+            bodyImagen = homologaService.createJsonImages(listaImages, dataMap.StockNumber)
+            if (bodyImagen.images.size() > 0) {
+                resultPostImage = restService.postResource("/images/${vehicleId}/", queryParams, bodyImagen)
+                println "Webservice POST map de images: " + resultPostImage
+                resultPostImage.arrayImages = [:]
+                resultPostImage.arrayImages = bodyImagen
+            }else{
+                jsonPostVehicle.published_sites = [mlm:[
+                    status:"waiting",
+                    action:"to_publish"
+                    //official_store_id:"235" Lo quitamos por peticion de Erick que le dijo Miguel 14-07-2015
+                ]]
+
+                jsonPostVehicle << [origin_update:"webservice"]
+
+                def respUpdApiVehicle = updateVehicle(vehicleId, jsonPostVehicle, accessToken)
+
+                resultPostImage = [
+                        status:HttpServletResponse.SC_NOT_FOUND,
+                        message:'Las fotos no corresponden al Vehiculo',
+                        error:"not_found"
+                ]
+            }
         }
         else{
-
-
             jsonPostVehicle.published_sites = [mlm:[
                     status:"waiting",
                     action:"to_publish"

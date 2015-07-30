@@ -4,7 +4,7 @@ class Logws {
 
     static constraints = {
 
-        action nullable: false, blank:false, inList: ['insert', 'update', 'delete', 'begin']
+        action nullable: false, blank:false, inList: ['insert', 'update', 'delete', 'begin', 'republish']
 
     }
 

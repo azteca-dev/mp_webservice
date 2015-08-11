@@ -36,7 +36,7 @@ class RestService {
         def restClient  = new RESTClient(urlBase)
         Map result = [:]
 
-
+        //println "parametros rest: " + queryParams
 
         try {
 

@@ -12,6 +12,16 @@ class UrlMappings {
             action = [GET:'index']
         }
 
+        "/logs/update"{
+            controller = "Logws"
+            action = [GET:'logsUpdate']
+        }
+
+        "/logs/search"{
+            controller = "Logws"
+            action = [GET:'search']
+        }
+
         "/republica"{
             controller = "Republica"
             action = [GET:'notAllowed', POST:'republica', PUT:'notAllowed', DELETE:'notAllowed']

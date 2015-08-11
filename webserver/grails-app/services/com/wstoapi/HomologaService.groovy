@@ -138,13 +138,13 @@ class HomologaService {
                 description:dataMap.Description,
                 attributes:getAttributes(dataMap.TypeCurrency, dataMap.ExteriorColor, dataMap.InteriorColor, dataMap.TypeVestureMPId, dataMap.TypeTransmissionMPId, dataMap.TypeVehicleMPId),
                 equipment:getEquipment(dataMap.Equipment),
-                published_sites:[
+                /*published_sites:[
                         mlm:[
                                 status:"waiting",
                                 action:"to_publish"
                                 //official_store_id:"235" Lo quitamos por peticion de Erick que le dijo Miguel 14-07-2015
                         ]
-                ],
+                ],*/
                 origin_update:"webservice"
 
 

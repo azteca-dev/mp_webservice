@@ -14,6 +14,7 @@ class CarsService {
     def homologaService
     def publicaService
     def logwsService
+    def updateToPublish
 
     static expose=['cxf']
 
@@ -303,6 +304,7 @@ class CarsService {
                                     logMap = logwsService.createMapLog(remoteAddress, dataLogMapOrigin, response, [vehicle:respUpdApiVehicle, status:respUpdateImages], Constants.LOG_STATUS_ERROR, Constants.LOG_ACTION_UPDATE, userId, dealerId, vehicleId, '')
                                 }
                             }
+                            updateToPublish = publicaService.updateVehicle(respUpdApiVehicle.data.id, [published_sites:[mlm:[status:"waiting",action:"to_publish"]]], accessToken)
                             logwsService.createLog(logMap)
                         }catch(Exception e){
                             response = "400 - error: Algo malo ocurrio al actualizar el vehiculo"

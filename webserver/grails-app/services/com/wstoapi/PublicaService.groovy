@@ -216,6 +216,20 @@ class PublicaService {
         vehicleId
     }
 
+    def searchVehicle(def resource, def queryParams){
+        //println "entre al vehiculoSearch: " + resource + " " + queryParams
+        def result = restService.getResource(resource, queryParams)
+        //println "resultado del vehiculoSearch: " + result
+        result
+    }
+
+    def existVehicle(def idVehicle){
+
+        def result = restService.getResource("/vehicletest/" + idVehicle)
+        result
+
+    }
+
     def updateVehicle(def vehicleId, def jsonUpdate, def accessToken){
 
         def queryParams = [
